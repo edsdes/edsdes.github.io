@@ -13,6 +13,21 @@
 :root {
   --card-bg: rgba(255, 255, 255, .8);
 }
+
+/* 夜间模式：卡片跟随深色文字方案，避免浅色卡片上出现白字 */
+[data-theme='dark'] {
+  --card-bg: rgba(18, 24, 29, .88);
+}
+
+[data-theme='dark'] #aside-content .card-widget,
+[data-theme='dark'] #recent-posts > .recent-post-item,
+[data-theme='dark'] .layout_page > div:first-child:not(.recent-posts),
+[data-theme='dark'] .layout_post > #page,
+[data-theme='dark'] .layout_post > #post,
+[data-theme='dark'] .read-mode .layout_post > #post {
+  background: rgba(18, 24, 29, .88);
+}
+
 /* 页脚透明 */
 #footer {
 	/* 以下代表透明度为0.7 */
