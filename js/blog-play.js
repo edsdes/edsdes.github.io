@@ -89,7 +89,7 @@
         showMessage(error.name === 'NotAllowedError' ? '点一下播放原片（含声音）' : '原片暂时无法播放，请重试', true);
       }
     }
-    video.volume = .65;
+    video.volume = 1;
     video.addEventListener('playing', () => {
       if (closed || finished) return;
       clearTimeout(loadTimer);
