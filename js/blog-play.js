@@ -97,10 +97,10 @@
       scheduleControlsHide();
     });
     video.addEventListener('waiting', () => { if (!finished && !closed) showMessage('视频缓冲中…'); });
-    // The selected clip becomes white at 19.05s. Follow media time so buffering
+    // The selected clip becomes white at 89.15s. Follow media time so buffering
     // cannot put the transition ahead of the actual explosion.
     function syncWhiteout(mediaTime) {
-      if (!closed && !finished && mediaTime >= 19.05) finish();
+      if (!closed && !finished && mediaTime >= 89.15) finish();
     }
     function followFrame(now, frame) {
       if (closed || finished) return;
@@ -181,7 +181,7 @@
       atomicTimer = setTimeout(closeAtomic, 3800);
     } else {
       // Only fetch media after the user triggers the Easter egg.
-      video.src = '/video/shadow-atomic.mp4?v=1080-v7';
+      video.src = '/video/shadow-atomic.mp4?v=bilibili-v10';
       if (video.requestVideoFrameCallback) frameHandle = video.requestVideoFrameCallback(followFrame);
       startPlayback();
     }
