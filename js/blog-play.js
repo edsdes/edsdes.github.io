@@ -181,7 +181,7 @@
       atomicTimer = setTimeout(closeAtomic, 3800);
     } else {
       // Only fetch media after the user triggers the Easter egg.
-      video.src = '/video/shadow-atomic.mp4?v=bilibili-v10';
+      video.src = '/video/shadow-atomic.mp4?v=clarity-v11';
       if (video.requestVideoFrameCallback) frameHandle = video.requestVideoFrameCallback(followFrame);
       startPlayback();
     }
