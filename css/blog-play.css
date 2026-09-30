@@ -63,3 +63,15 @@
   .blog-avatar-button img, .blog-avatar-bubble, #go-up.blog-rocket-button > svg { transition: none !important; transform: none !important; }
   .blog-atomic, .blog-atomic-white, .blog-genshin-splash, .blog-atomic-controls { transition: none; }
 }
+
+/* Volume controls share the playback toolbar's idle fade. */
+.blog-atomic-controls { align-items: center; flex-wrap: wrap; justify-content: flex-end; max-width: calc(100% - 24px); }
+.blog-atomic-volume { display: flex; align-items: center; gap: 8px; padding: 4px 10px; border: 1px solid #ffffff40; border-radius: 7px; background: #101019aa; color: #fff; }
+.blog-atomic-volume-slider { display: block; width: clamp(72px, 18vw, 112px); height: 28px; margin: 0; padding: 0; accent-color: #cda3f3; cursor: pointer; touch-action: none; }
+.blog-atomic-volume-value { min-width: 34px; text-align: right; font-size: 12px; line-height: 1.6; font-variant-numeric: tabular-nums; }
+.blog-atomic-volume-slider:focus-visible { outline: 2px solid #cda3f3; outline-offset: 3px; border-radius: 4px; }
+@media (max-width: 480px) {
+  .blog-atomic-controls { right: max(12px, env(safe-area-inset-right)); gap: 6px; }
+  .blog-atomic-controls button { padding: 8px; }
+  .blog-atomic-volume { padding: 4px 7px; gap: 6px; }
+}

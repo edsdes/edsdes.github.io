@@ -30,22 +30,26 @@
       '<div class="blog-atomic-white" aria-hidden="true"></div>' +
       '<div class="blog-genshin-splash"><img src="/img/genshin-start-screen.png" alt="原神启动画面" width="1586" height="992" draggable="false"><span class="blog-genshin-fallback" hidden>原神</span></div>' +
       '<div class="blog-atomic-playback"><span class="blog-atomic-status" role="status">正在加载原片…</span><button class="blog-atomic-play" type="button" hidden>播放原片</button></div>' +
-      '<div class="blog-atomic-controls"><button class="blog-atomic-sound" type="button" aria-pressed="false" title="静音">声音：开</button><button class="blog-atomic-skip" type="button">退出 · Esc</button></div>';
+      '<div class="blog-atomic-controls"><button class="blog-atomic-sound" type="button" aria-pressed="false" title="静音">声音：开</button><label class="blog-atomic-volume"><input class="blog-atomic-volume-slider" type="range" min="0" max="100" step="1" value="100" aria-label="彩蛋音量" aria-valuetext="100%"><span class="blog-atomic-volume-value" aria-hidden="true">100%</span></label><button class="blog-atomic-skip" type="button">退出 · Esc</button></div>';
     const video = layer.querySelector('video');
     const skip = layer.querySelector('.blog-atomic-skip');
     const sound = layer.querySelector('.blog-atomic-sound');
+    const controls = layer.querySelector('.blog-atomic-controls');
+    const volumeControl = layer.querySelector('.blog-atomic-volume');
+    const volumeSlider = layer.querySelector('.blog-atomic-volume-slider');
+    const volumeValue = layer.querySelector('.blog-atomic-volume-value');
     const play = layer.querySelector('.blog-atomic-play');
     const status = layer.querySelector('.blog-atomic-status');
     const playback = layer.querySelector('.blog-atomic-playback');
     const logo = layer.querySelector('.blog-genshin-splash img');
     const timers = [];
     let closed = false, finished = false, needsReload = false, loadTimer, frameHandle;
-    let controlsTimer, keyboardControls = false;
+    let controlsTimer, keyboardControls = false, adjustingVolume = false, lastAudibleVolume = 1;
     function scheduleControlsHide() {
       clearTimeout(controlsTimer);
-      if (closed || keyboardControls || !playback.hidden) return;
+      if (closed || keyboardControls || adjustingVolume || !playback.hidden) return;
       controlsTimer = setTimeout(() => {
-        if (!closed && !keyboardControls && playback.hidden) layer.classList.add('controls-idle');
+        if (!closed && !keyboardControls && !adjustingVolume && playback.hidden) layer.classList.add('controls-idle');
       }, 2000);
     }
     function showControls() {
@@ -66,6 +70,7 @@
       // Let the original explosion audio finish naturally under the whiteout.
       playback.hidden = true;
       sound.hidden = true;
+      volumeControl.hidden = true;
       scheduleControlsHide();
       layer.dataset.phase = 'white';
       after(() => { layer.dataset.phase = 'logo'; }, 260);
@@ -119,13 +124,46 @@
       event.stopPropagation();
       startPlayback(needsReload);
     });
+    function syncVolume() {
+      const silent = video.muted || video.volume === 0;
+      const percent = silent ? 0 : Math.round(video.volume * 100);
+      if (!silent) lastAudibleVolume = video.volume;
+      volumeSlider.value = String(percent);
+      volumeSlider.setAttribute('aria-valuetext', percent + '%');
+      volumeValue.textContent = percent + '%';
+      sound.textContent = silent ? '声音：关' : '声音：开';
+      sound.title = silent ? '开启声音' : '静音';
+      sound.setAttribute('aria-pressed', String(silent));
+    }
+    video.addEventListener('volumechange', syncVolume);
+    controls.addEventListener('click', event => event.stopPropagation());
     sound.addEventListener('click', event => {
       event.stopPropagation();
-      video.muted = !video.muted;
-      sound.textContent = video.muted ? '声音：关' : '声音：开';
-      sound.title = video.muted ? '开启声音' : '静音';
-      sound.setAttribute('aria-pressed', String(video.muted));
+      if (video.muted || video.volume === 0) {
+        if (video.volume === 0) video.volume = lastAudibleVolume;
+        video.muted = false;
+      } else video.muted = true;
+      syncVolume();
+      showControls();
     });
+    volumeSlider.addEventListener('input', () => {
+      video.volume = Number(volumeSlider.value) / 100;
+      video.muted = video.volume === 0;
+      syncVolume();
+      showControls();
+    });
+    volumeSlider.addEventListener('pointerdown', event => {
+      adjustingVolume = true;
+      try { volumeSlider.setPointerCapture(event.pointerId); } catch (_) {}
+      showControls();
+    });
+    const endVolumeAdjustment = () => {
+      if (!adjustingVolume) return;
+      adjustingVolume = false;
+      showControls();
+    };
+    ['pointerup', 'pointercancel', 'lostpointercapture'].forEach(name => volumeSlider.addEventListener(name, endVolumeAdjustment));
+    syncVolume();
     logo.addEventListener('error', () => {
       logo.hidden = true;
       layer.querySelector('.blog-genshin-fallback').hidden = false;
@@ -155,9 +193,14 @@
         event.preventDefault();
         keyboardControls = true;
         showControls();
-        const buttons = [...layer.querySelectorAll('button')].filter(button => !button.hidden && button.getClientRects().length);
+        const buttons = [...layer.querySelectorAll('button, input[type="range"]')].filter(button => !button.hidden && button.getClientRects().length);
         const index = buttons.indexOf(document.activeElement);
         buttons[(index + (event.shiftKey ? -1 : 1) + buttons.length) % buttons.length]?.focus({ preventScroll: true });
+      }
+      if (event.target === volumeSlider) {
+        keyboardControls = true;
+        showControls();
+        return;
       }
       if (['ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End'].includes(event.key)) event.preventDefault();
     });
@@ -177,11 +220,12 @@
     if (calm) {
       playback.hidden = true;
       sound.hidden = true;
+      volumeControl.hidden = true;
       scheduleControlsHide();
       atomicTimer = setTimeout(closeAtomic, 3800);
     } else {
       // Only fetch media after the user triggers the Easter egg.
-      video.src = '/video/shadow-atomic.mp4?v=clarity-v11';
+      video.src = '/video/shadow-atomic.mp4?v=optimized-v12';
       if (video.requestVideoFrameCallback) frameHandle = video.requestVideoFrameCallback(followFrame);
       startPlayback();
     }
