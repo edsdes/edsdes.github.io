@@ -1,0 +1,59 @@
+/* A reading toolbar, with details shown only after a click. */
+.blog-explore-card {
+  --blog-explore-accent: #615769;
+  --blog-explore-muted: #7b747e;
+  --blog-explore-border: rgba(128, 118, 132, .2);
+  box-sizing: border-box;
+  width: 100%;
+  margin: 0 0 8px;
+  padding: 12px 18px;
+  border: 0;
+  border-radius: 0;
+  background: var(--card-bg, rgba(255, 255, 255, .88));
+  box-shadow: none;
+  color: var(--font-color, #4c4948);
+}
+.blog-explore-card [hidden] { display: none !important; }
+.blog-explore-bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.blog-explore-controls { display: flex; align-items: center; gap: 24px; min-width: 0; }
+.blog-explore-random, .blog-explore-fortune {
+  display: inline-flex; align-items: center; min-height: 44px; padding: 6px 0;
+  border: 0; border-radius: 2px; background: transparent; color: var(--blog-explore-accent);
+  font: inherit; font-size: 13px; line-height: 1.8; cursor: pointer; white-space: nowrap;
+}
+.blog-explore-random:hover, .blog-explore-fortune:hover, .blog-explore-fortune[aria-expanded='true'] { text-decoration: underline; text-underline-offset: 4px; }
+.blog-explore-random:disabled { opacity: .55; cursor: wait; }
+.blog-explore-emblem {
+  display: grid; place-items: center; flex: 0 0 44px; width: 44px; height: 44px; margin: 0; padding: 0;
+  border: 0; border-radius: 3px; background: transparent; color: #aaa2af; font: inherit; font-size: 18px; line-height: 1; cursor: pointer;
+}
+.blog-explore-emblem:hover { color: var(--blog-explore-accent); }
+.blog-explore-emblem-main { display: block; }
+.blog-explore-emblem.blog-explore-lit { color: #b39450; }
+.blog-explore-emblem.blog-explore-awake .blog-explore-emblem-main { animation: blog-explore-glow .9s ease; }
+.blog-explore-status { margin: 3px 0 0; color: var(--blog-explore-muted); font-size: 12px; line-height: 1.8; }
+.blog-explore-preview { position: relative; margin: 5px 0 2px; padding: 2px 100px 2px 12px; border-left: 2px solid var(--blog-explore-border); }
+.blog-explore-preview-label { display: block; margin-bottom: 2px; color: var(--blog-explore-muted); font-size: 11px; }
+.blog-explore-title { display: block; color: inherit; font-size: 15px; line-height: 1.7; overflow-wrap: anywhere; text-decoration: none; }
+.blog-explore-title:hover { color: var(--blog-explore-accent); text-decoration: underline; text-underline-offset: 3px; }
+.blog-explore-go { position: absolute; right: 0; top: 50%; min-height: 36px; padding: 8px 0; color: var(--blog-explore-accent); font-size: 12px; white-space: nowrap; text-decoration: none; transform: translateY(-50%); }
+.blog-explore-go:hover { color: var(--blog-explore-accent); text-decoration: underline; text-underline-offset: 4px; }
+.blog-explore-fortune-panel { margin: 5px 0 2px; padding: 1px 0 1px 12px; border-left: 2px solid var(--blog-explore-border); }
+.blog-explore-fortune-date { display: block; color: var(--blog-explore-muted); font-size: 11px; line-height: 1.8; }
+.blog-explore-fortune-title { margin: 3px 0 5px; color: inherit; font-size: 15px; line-height: 1.5; font-weight: 600; }
+.blog-explore-fortune-good, .blog-explore-fortune-advice { margin: 4px 0 0; color: inherit; font-size: 13px; line-height: 1.8; overflow-wrap: anywhere; }
+.blog-explore-fortune-advice { color: var(--blog-explore-muted); font-size: 12px; }
+.blog-explore-starlight-status { margin: 3px 0 1px; color: var(--blog-explore-muted); font-size: 12px; line-height: 1.8; }
+.blog-explore-card button:focus-visible, .blog-explore-card a:focus-visible { outline: 2px solid var(--blog-explore-accent); outline-offset: 3px; }
+[data-theme='dark'] .blog-explore-card { --blog-explore-accent: #c2b5cc; --blog-explore-muted: #a99faf; --blog-explore-border: rgba(169, 159, 175, .2); }
+[data-theme='dark'] .blog-explore-emblem.blog-explore-lit { color: #d2b26b; }
+@keyframes blog-explore-glow { 45% { text-shadow: 0 0 7px #d3b676; transform: scale(1.15); } }
+@media (max-width: 600px) {
+  .blog-explore-card { padding: 24px 12px; margin-bottom: 4px; }
+  .blog-explore-controls { gap: 20px; }
+  .blog-explore-preview { padding-right: 0; }
+  .blog-explore-go { position: static; display: inline-block; margin-top: 2px; padding: 5px 0; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .blog-explore-emblem.blog-explore-awake .blog-explore-emblem-main { animation: none; }
+}

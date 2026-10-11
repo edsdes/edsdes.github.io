@@ -16,6 +16,7 @@
   function atomic() {
     if (atomicLayer || Date.now() - lastAtomic < 4000) return;
     lastAtomic = Date.now();
+    window.BlogAdventure?.discover('atomic');
     const calm = reduced();
     const previousFocus = document.activeElement;
     const layer = document.createElement('div');
@@ -282,6 +283,7 @@
       goUp.innerHTML = rocketSvg;
       // Keep Butterfly's original click handler and scrolling behavior.
       goUp.addEventListener('click', () => {
+        window.BlogAdventure?.discover('rocket');
         if (rocketBusy || reduced()) return;
         rocketBusy = true;
         const box = goUp.getBoundingClientRect();
@@ -300,6 +302,7 @@
   let typed = '', lastKey = 0;
   document.addEventListener('keydown', event => {
     if (event.key === 'Escape') { closeAtomic(); typed = ''; return; }
+    if (document.querySelector('dialog[open]')) { typed = ''; return; }
     if (event.isComposing || event.repeat || event.ctrlKey || event.metaKey || event.altKey ||
         event.target.closest('input, textarea, select, [contenteditable]:not([contenteditable="false"]), [role="textbox"]')) {
       typed = ''; return;
