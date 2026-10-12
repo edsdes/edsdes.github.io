@@ -9,14 +9,24 @@
   const roles = { debug: '找 bug 的', writeup: '写 WP 的', game: '负责摸鱼的', observe: '观测世界线的' };
   const worldlines = ['1.048596', '0.571024', '0.337187', '1.130426'];
   const entries = [
-    { id: 'traveler', icon: '↗', title: '随便逛过了', hint: '首页随机选一篇文章，真的过去看看。' },
-    { id: 'fortune', icon: '☾', title: '今日便签', hint: '首页有张每天换一次的小纸条。' },
-    { id: 'starlight', icon: '✦', title: '可疑的星星', hint: '首页那颗星星可以多点几下。' },
-    { id: 'rocket', icon: '↑', title: '搭过火箭', hint: '右下角的小火箭负责回到顶部。' },
-    { id: 'atomic', icon: '◈', title: '暗影剧场', hint: '侧栏头像，连续打几次招呼。' },
-    { id: 'graduate', icon: '⚑', title: 'CTF 三题通过', hint: 'CTF 小练习的三道题，各有一枚 flag。' },
-    { id: 'terminal', icon: '⌘', title: '实验室的秘密', hint: '隐藏终端里，有个以点开头的文件。' },
-    { id: 'arcade', icon: '♧', title: '摸鱼记录', hint: '去摸鱼角翻牌或抓 flag，赢一局就算。' }
+    { id: 'traveler', icon: '↗', title: '随便逛过了', hint: '首页随机选一篇文章，真的过去看看。', action: '去翻一篇文章', href: '/#recent-posts', target: '.blog-explore-random' },
+    { id: 'fortune', icon: '☾', title: '今日便签', hint: '首页有张每天换一次的小纸条。', action: '去看今日便签', href: '/#recent-posts', target: '.blog-explore-fortune' },
+    { id: 'starlight', icon: '✦', title: '可疑的星星', hint: '首页那颗星星可以多点几下。', action: '去找那颗星星', href: '/#recent-posts', target: '.blog-explore-emblem' },
+    { id: 'rocket', icon: '↑', title: '搭过火箭', hint: '向下逛一逛，再点右下角的小火箭回到顶部。', action: '去页面下方', href: '/#footer', target: '#footer', tip: '到页面下方了。右下角的小火箭，负责送你回顶部。' },
+    { id: 'atomic', icon: '◈', title: '暗影剧场', hint: '和侧栏头像连续打几次招呼；手机上先展开菜单。', action: '去找博主头像', href: '/#aside-content', target: '.blog-avatar-button' },
+    { id: 'graduate', icon: '⚑', title: 'CTF 三题通过', hint: 'CTF 小练习的三道题，各有一枚 flag。', action: '去做 CTF 小练习', href: '/play/' },
+    { id: 'terminal', icon: '⌘', title: '实验室的秘密', hint: '隐藏终端里，有个以点开头的文件。', action: '打开隐藏终端', panel: 'terminal' },
+    { id: 'arcade', icon: '♧', title: '摸鱼记录', hint: '摸鱼角里翻牌或抓 flag，赢一局就算。', action: '去摸鱼角玩一局', href: '/play/arcade/' }
+  ];
+  const clubCharacters = [
+    { id: 'haruhi', name: '春日', work: '凉宫春日的忧郁', x: '0%', y: '0%', notes: ['今天的议题：找点不寻常的事。先从这本彩蛋簿开始。', '活动经费暂时没有，零食可以先记在团长账上。'] },
+    { id: 'konata', name: '此方', work: '幸运星', x: '33.333%', y: '0%', notes: ['把写 WP 排进日程以后，就可以先打一会儿游戏了。', '键盘摆好了，茶也泡了。接下来只差一个不想摸鱼的我。'] },
+    { id: 'kurisu', name: '红莉栖', work: '命运石之门', x: '66.667%', y: '0%', notes: ['同一个 bug 改了三次？把报错给我，先别怪世界线。', '微波炉旁边那台电脑可以用。不要往里面放香蕉。'] },
+    { id: 'yuki', name: '长门有希', work: '凉宫春日的忧郁', x: '100%', y: '0%', notes: ['书在桌上。书签停在还没看完的那一页。', '记录已保存。建议先把茶喝掉。'] },
+    { id: 'mikoto', name: '御坂美琴', work: '某科学的超电磁炮', x: '0%', y: '100%', notes: ['街机的最高分先放一边。你刚才那局还没结束。', '电脑又没反应了？别看我，这次真的没放电。'] },
+    { id: 'azusa', name: '中野梓', work: '轻音少女', x: '33.333%', y: '100%', notes: ['茶可以再喝一杯，练习也别拖到明天。', '零食先放下。至少把这一小段做完吧。'] },
+    { id: 'kuroneko', name: '黑猫', work: '我的妹妹哪有这么可爱！', x: '66.667%', y: '100%', notes: ['这份题解的标题太朴素了。内容倒是可以再看一遍。', '所谓隐藏记录……你总得先把隐藏文件列出来。'] },
+    { id: 'saber', name: 'Saber', work: 'Fate/stay night', x: '100%', y: '100%', notes: ['休息时间到了。吃完这份点心，再继续。', '准备充分再开始。饿着肚子很难赢下一局。'] }
   ];
   const ids = entries.map(entry => entry.id);
   function read() {
@@ -116,6 +126,7 @@
           const fallback = launcher.isConnected ? launcher : document.querySelector('[data-open-book], [data-sos-room]');
           fallback?.focus({ preventScroll: true });
         }
+        window.dispatchEvent(new CustomEvent('blog:panel', { detail: { open: false, kind } }));
       }
     }, { once: true });
     if (!activeDialog) previousOverflow = document.documentElement.style.overflow;
@@ -123,13 +134,14 @@
     document.documentElement.style.overflow = 'hidden';
     document.body.append(dialog);
     dialog.showModal();
+    window.dispatchEvent(new CustomEvent('blog:panel', { detail: { open: true, kind } }));
     toast.classList.remove('is-visible');
     return dialog;
   }
   function openBook() {
-    const dialog = panel('book', '彩蛋簿', '逛到哪里，记到哪里。八个都找到以后，可以收下一张纪念卡。');
+    const dialog = panel('book', '彩蛋簿', '小站里的八处小地方，路过就留一枚章。');
     const body = dialog.querySelector('.adventure-panel-body');
-    body.innerHTML = '<div class="adventure-book-progress"><span>已经找到 <strong data-book-count></strong></span><progress max="8" value="0" aria-label="彩蛋收集进度"></progress></div><nav class="adventure-book-footer" aria-label="彩蛋入口"><button type="button" class="adventure-secondary" data-open-anime>SOS 团部室</button><button type="button" class="adventure-secondary" data-open-wish>抽张纸条</button><button type="button" class="adventure-secondary" data-open-terminal>隐藏终端</button><a href="/play/">CTF 小练习</a><a href="/play/arcade/">摸鱼角</a></nav><div class="adventure-stamps"></div><section class="adventure-reward" hidden><h3>留在最后的一封信</h3><details><summary>拆开这封信</summary><p class="adventure-letter-message"></p><p class="adventure-letter-sign">—— 无敌马的小窝</p></details><div class="adventure-reward-actions"><button type="button" class="adventure-secondary" data-open-keepsake>收下纪念卡 ↗</button><button type="button" class="adventure-secondary" data-reward-wish>看看金色便签</button></div><p class="adventure-letter-note">还有一张部室合照和限定金色便签，可以一起收下。</p></section><p class="adventure-local-note">记录存在当前浏览器里。</p>';
+    body.innerHTML = '<div class="adventure-book-intro"><div><span class="adventure-page-label">部室杂记 / 01</span><p>文章之外，还有几处可以坐坐。<br>找齐八枚，就能收下最后那封信。</p></div><figure class="adventure-book-photo"><img src="/img/easter-eggs/classic-club-afternoon.webp" alt="长门、美琴、梓和黑猫在部室喝下午茶" width="1536" height="864" loading="lazy" decoding="async"><figcaption>茶还没凉，慢慢逛。</figcaption></figure></div><div class="adventure-book-progress"><span>探索记录 <strong data-book-count></strong></span><progress max="8" value="0" aria-label="彩蛋收集进度"></progress></div><div class="adventure-stamps" aria-label="八枚彩蛋记录"></div><nav class="adventure-book-footer" aria-label="部室入口"><span>歇一会儿：</span><button type="button" class="adventure-secondary" data-open-anime>SOS 团部室</button><button type="button" class="adventure-secondary" data-open-wish>抽张纸条</button></nav><section class="adventure-reward" hidden><h3>留在最后的一封信</h3><details><summary>拆开这封信</summary><p class="adventure-letter-message"></p><p class="adventure-letter-sign">—— 无敌马的小窝</p></details><div class="adventure-reward-actions"><button type="button" class="adventure-secondary" data-open-keepsake>收下纪念卡 ↗</button><button type="button" class="adventure-secondary" data-reward-wish>看看金色便签</button></div><p class="adventure-letter-note">还有一张部室合照和限定金色便签，可以一起收下。</p></section><p class="adventure-local-note">记录存在当前浏览器里。</p>';
     body.querySelector('.adventure-letter-message').textContent = greeting;
     body.querySelector('[data-open-keepsake]').addEventListener('click', openKeepsake);
     body.querySelector('[data-reward-wish]').addEventListener('click', () => {
@@ -138,16 +150,45 @@
       activeDialog.querySelector('[data-wish]').click();
     });
     const stamps = body.querySelector('.adventure-stamps');
-    entries.forEach(entry => {
+    entries.forEach((entry, index) => {
       const item = document.createElement('article');
       item.className = 'adventure-stamp';
       item.dataset.discovery = entry.id;
-      item.innerHTML = '<span class="adventure-stamp-icon" aria-hidden="true"></span><div><h3></h3><p></p><span data-entry-state></span></div>';
+      item.innerHTML = '<span class="adventure-stamp-icon" aria-hidden="true"></span><div><div class="adventure-stamp-heading"><span class="adventure-stamp-number" aria-hidden="true"></span><h3></h3></div><p></p><div class="adventure-stamp-foot"><span data-entry-state></span></div></div>';
       item.querySelector('.adventure-stamp-icon').textContent = entry.icon;
+      item.querySelector('.adventure-stamp-number').textContent = String(index + 1).padStart(2, '0');
       item.querySelector('p').textContent = entry.hint;
+      const action = document.createElement(entry.panel ? 'button' : 'a');
+      action.className = 'adventure-entry-link';
+      action.textContent = entry.action + ' →';
+      if (entry.panel) {
+        action.type = 'button';
+        action.dataset.openTerminal = '';
+        action.addEventListener('click', openTerminal);
+      } else {
+        action.href = entry.href;
+        if (entry.target) action.addEventListener('click', event => {
+          const targets = Array.from(document.querySelectorAll(entry.target));
+          let target = targets.find(node => node.getClientRects().length && !node.closest('#sidebar-menus:not(.open)'));
+          let openMenu = false;
+          if (!target && entry.id === 'atomic' && document.querySelector('#toggle-menu')?.getClientRects().length) {
+            target = targets.find(node => node.closest('#sidebar-menus'));
+            openMenu = !!target;
+          }
+          if (!target) return;
+          event.preventDefault();
+          dialog.addEventListener('close', () => {
+            if (openMenu) document.querySelector('#toggle-menu').click();
+            else target.scrollIntoView({ block: 'center', behavior: 'auto' });
+            if (typeof target.focus === 'function' && target.matches('button, a, input')) target.focus({ preventScroll: true });
+            if (entry.tip) notice(entry.tip);
+          }, { once: true });
+          dialog.close();
+        });
+      }
+      item.querySelector('.adventure-stamp-foot').append(action);
       stamps.append(item);
     });
-    body.querySelector('[data-open-terminal]').addEventListener('click', openTerminal);
     body.querySelector('[data-open-wish]').addEventListener('click', openWish);
     body.querySelector('[data-open-anime]').addEventListener('click', openAnime);
     sync();
@@ -297,24 +338,57 @@
     body.querySelector('[data-sos-date]').textContent = saved.date;
   }
   function openAnime() {
-    const dialog = panel('anime', 'SOS 团 · 临时部室', '团长要开会，此方说再打一局。');
+    const dialog = panel('anime', 'SOS 团 · 临时部室', '今天也没正经开会。桌上倒是多了几张留言。');
     const body = dialog.querySelector('.adventure-panel-body');
     if (membershipSaved) membership = readSOS();
-    body.innerHTML = '<figure class="adventure-sos-photo"><img src="/img/easter-eggs/sos-clubroom.webp" alt="春日和此方在午后的部室，一边看 CTF 资料一边摸鱼" width="1536" height="768" decoding="async"><figcaption>部室记录 / 今天的议题：为什么假期总是过得那么快</figcaption></figure><section class="adventure-konata"><span class="adventure-konata-speaker">部室便签 · 此方的碎碎念</span><p class="adventure-konata-line" aria-live="polite"></p><button type="button" class="adventure-anime-next">换张便签 ↻</button></section><form class="adventure-sos-form"><h3>入团登记</h3><p class="adventure-sos-note">宇宙人、未来人、异世界人，以及今晚还没写 WP 的人。</p><div class="adventure-sos-fields"><label for="adventure-sos-name">怎么称呼你<input id="adventure-sos-name" name="name" maxlength="20" required placeholder="路过的阿宅" autocomplete="nickname"></label><label for="adventure-sos-role">部室分工<select id="adventure-sos-role" name="role"><option value="debug">找 bug 的</option><option value="writeup">写 WP 的</option><option value="game">负责摸鱼的</option><option value="observe">观测世界线的</option></select></label></div><button type="submit" class="adventure-secondary adventure-sos-submit" data-sos-join>交给团长</button><span class="adventure-sos-local">登记只保存在你的浏览器里。</span></form><section class="adventure-sos-receipt" hidden aria-live="polite"><div class="adventure-sos-receipt-head"><h3>临时团员证</h3><span data-sos-number></span></div><p><strong data-sos-name></strong><span> / </span><span data-sos-role></span></p><p class="adventure-sos-approval">批准。下次开会记得带点零食。</p><div class="adventure-sos-receipt-foot"><time data-sos-date></time><button type="button" class="adventure-sos-edit">重新填表</button></div></section>';
-    const notes = [
-      '把「写 WP」排进日程以后，就可以心安理得地先打一会儿游戏了。',
-      '团长说要找不寻常的事。我打开控制台，红色的东西还挺多。',
-      '暑假作业当然是最后一天写。WP 嘛，比赛已经结束了，再等等也行。',
-      '讨论从巧克力螺的哪头开始吃，比讨论这个 bug 更有进展。',
-      '今天的部室活动：打开编辑器。活动结束。',
-      '已经点开第七篇文章了。原来这也算一种无限的八月。',
-      '古泉说这属于正常现象。长门没说话，已经把题解看完了。',
-      '键盘摆好了，茶也泡了。接下来只差一个不想摸鱼的我。'
-    ];
-    let index = Math.floor(Math.random() * notes.length);
+    body.innerHTML = '<figure class="adventure-sos-photo"><img src="/img/easter-eggs/sos-clubroom.webp" alt="春日和此方在午后的部室，一边看 CTF 资料一边摸鱼" width="1536" height="768" loading="lazy" decoding="async"><figcaption>部室记录 / 今天的议题：为什么假期总是过得那么快</figcaption></figure><section class="adventure-club-notes" aria-labelledby="adventure-club-notes-title"><div class="adventure-club-notes-head"><h3 id="adventure-club-notes-title">部室留言</h3><span>看看谁留了字条</span></div><div class="adventure-character-list" role="group" aria-label="选择留言角色"></div><div class="adventure-konata"><span class="adventure-note-portrait adventure-character-portrait" aria-hidden="true"></span><div class="adventure-note-copy"><div class="adventure-konata-speaker"><strong data-character-speaker></strong><small data-character-work></small></div><p class="adventure-konata-line" aria-live="polite"></p><button type="button" class="adventure-anime-next">换张便签 ↻</button></div></div></section><nav class="adventure-room-links" aria-label="从部室出发"><button type="button" class="adventure-secondary" data-back-book>翻开彩蛋簿</button><a href="/play/arcade/">去摸鱼角 →</a></nav><form class="adventure-sos-form"><h3>入团登记</h3><p class="adventure-sos-note">宇宙人、未来人、异世界人，以及今晚还没写 WP 的人。</p><div class="adventure-sos-fields"><label for="adventure-sos-name">怎么称呼你<input id="adventure-sos-name" name="name" maxlength="20" required placeholder="路过的阿宅" autocomplete="nickname"></label><label for="adventure-sos-role">部室分工<select id="adventure-sos-role" name="role"><option value="debug">找 bug 的</option><option value="writeup">写 WP 的</option><option value="game">负责摸鱼的</option><option value="observe">观测世界线的</option></select></label></div><button type="submit" class="adventure-secondary adventure-sos-submit" data-sos-join>交给团长</button><span class="adventure-sos-local">登记只保存在你的浏览器里。</span></form><section class="adventure-sos-receipt" hidden aria-live="polite"><div class="adventure-sos-receipt-head"><h3>临时团员证</h3><span data-sos-number></span></div><p><strong data-sos-name></strong><span> / </span><span data-sos-role></span></p><p class="adventure-sos-approval">批准。下次开会记得带点零食。</p><div class="adventure-sos-receipt-foot"><time data-sos-date></time><button type="button" class="adventure-sos-edit">重新填表</button></div></section>';
+    const characters = body.querySelector('.adventure-character-list');
+    const notePortrait = body.querySelector('.adventure-note-portrait');
     const line = body.querySelector('.adventure-konata-line');
-    line.textContent = notes[index];
-    body.querySelector('.adventure-anime-next').addEventListener('click', () => { index = (index + 1) % notes.length; line.textContent = notes[index]; });
+    const noteIndexes = clubCharacters.map(() => 0);
+    let selectedCharacter = 1;
+    function showCharacter(index) {
+      selectedCharacter = index;
+      const character = clubCharacters[index];
+      characters.querySelectorAll('[data-character]').forEach(button => {
+        const selected = button.dataset.character === character.id;
+        button.setAttribute('aria-pressed', String(selected));
+        button.classList.toggle('is-selected', selected);
+      });
+      notePortrait.style.setProperty('--portrait-x', character.x);
+      notePortrait.style.setProperty('--portrait-y', character.y);
+      body.querySelector('[data-character-speaker]').textContent = character.name + '的便签';
+      body.querySelector('[data-character-work]').textContent = character.work;
+      line.textContent = character.notes[noteIndexes[index]];
+    }
+    clubCharacters.forEach((character, index) => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'adventure-character';
+      button.dataset.character = character.id;
+      button.setAttribute('aria-pressed', 'false');
+      button.setAttribute('aria-label', '看' + character.name + '的留言');
+      button.innerHTML = '<span class="adventure-character-portrait" aria-hidden="true"></span><span class="adventure-character-name"></span>';
+      button.querySelector('.adventure-character-portrait').style.setProperty('--portrait-x', character.x);
+      button.querySelector('.adventure-character-portrait').style.setProperty('--portrait-y', character.y);
+      button.querySelector('.adventure-character-name').textContent = character.name;
+      button.addEventListener('click', () => showCharacter(index));
+      button.addEventListener('keydown', event => {
+        const offsets = { ArrowLeft: -1, ArrowRight: 1, ArrowUp: -4, ArrowDown: 4 };
+        if (!Object.hasOwn(offsets, event.key) && event.key !== 'Home' && event.key !== 'End') return;
+        event.preventDefault();
+        const next = event.key === 'Home' ? 0 : event.key === 'End' ? clubCharacters.length - 1 : (index + offsets[event.key] + clubCharacters.length) % clubCharacters.length;
+        showCharacter(next);
+        characters.children[next].focus({ preventScroll: true });
+      });
+      characters.append(button);
+    });
+    body.querySelector('.adventure-anime-next').addEventListener('click', () => {
+      noteIndexes[selectedCharacter] = (noteIndexes[selectedCharacter] + 1) % clubCharacters[selectedCharacter].notes.length;
+      showCharacter(selectedCharacter);
+    });
+    body.querySelector('[data-back-book]').addEventListener('click', openBook);
+    showCharacter(selectedCharacter);
     const form = body.querySelector('.adventure-sos-form');
     const name = body.querySelector('#adventure-sos-name');
     const role = body.querySelector('#adventure-sos-role');

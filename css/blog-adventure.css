@@ -1,4 +1,4 @@
-/* A small fansite notebook, a clubroom and an amber laboratory terminal. */
+/* The clubroom notebook, a few familiar faces, and the old laboratory terminal. */
 .adventure-footer-corners { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; column-gap: 12px; margin: 3px 0 0; font-size: 12px; line-height: 1.8; }
 .adventure-launcher, .adventure-footer-room { position: static; display: inline-flex; align-items: center; min-height: 44px; padding: 6px 0; border: 0; background: transparent; color: inherit; font: inherit; line-height: 1.8; cursor: pointer; text-decoration: none; }
 .adventure-footer-separator { opacity: .45; font-size: 10px; }
@@ -7,13 +7,13 @@
 
 .adventure-toast { position: fixed; z-index: 10030; left: 50%; bottom: 105px; width: max-content; max-width: calc(100vw - 28px); padding: 10px 15px; border: 1px solid #b7c5cd; border-radius: 4px; background: #fffffff5; color: #475962; font-size: 13px; line-height: 1.8; opacity: 0; visibility: hidden; pointer-events: none; transform: translate(-50%, 6px); transition: opacity .2s, transform .2s, visibility .2s; }
 .adventure-toast.is-visible { opacity: 1; visibility: visible; transform: translate(-50%, 0); }
-.adventure-dialog { --adv-ink: #343b42; --adv-muted: #69747d; --adv-accent: #396887; --adv-line: #dce1e4; --adv-soft: #f3f5f6; --adv-paper: #fffefa; width: min(620px, calc(100vw - 28px)); max-width: calc(100vw - 28px); max-height: calc(100dvh - 40px); margin: auto; padding: 0; border: 1px solid #aab5bd; border-radius: 6px; background: var(--adv-paper); color: var(--adv-ink); box-shadow: 0 16px 55px #131b2c45; overflow: auto; overscroll-behavior: contain; font-size: 13px; }
+.adventure-dialog { --adv-ink: #454437; --adv-muted: #777366; --adv-accent: #795a43; --adv-line: #d9d3c5; --adv-soft: #f1ece1; --adv-paper: #fbf8ef; width: min(620px, calc(100vw - 28px)); max-width: calc(100vw - 28px); max-height: calc(100dvh - 40px); margin: auto; padding: 0; border: 1px solid #b5aa98; border-radius: 4px; background: var(--adv-paper); color: var(--adv-ink); box-shadow: 0 16px 55px #131b2c45; overflow: auto; overscroll-behavior: contain; font-size: 13px; }
 .adventure-dialog::backdrop { background: #101821a8; }
 .adventure-dialog, .adventure-dialog *, .adventure-dialog *::before, .adventure-dialog *::after { box-sizing: border-box; }
 .adventure-dialog [hidden] { display: none !important; }
 .adventure-panel { padding: 22px; }
 .adventure-panel-head { position: sticky; top: 0; z-index: 3; display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 0 0 9px; border-bottom: 1px solid var(--adv-line); background: var(--adv-paper); }
-.adventure-panel-head h2 { margin: 0; color: inherit; font-size: 21px; font-weight: 600; line-height: 1.5; }
+.adventure-panel-head h2 { margin: 0; color: inherit; font-family: "Noto Serif SC", "Songti SC", SimSun, serif; font-size: 21px; font-weight: 600; line-height: 1.5; letter-spacing: .03em; }
 .adventure-close { flex-shrink: 0; width: 44px; height: 44px; padding: 0; border: 0; border-radius: 3px; background: transparent; color: var(--adv-muted); font-size: 26px; line-height: 1; cursor: pointer; }
 .adventure-close:hover { background: var(--adv-soft); }
 .adventure-subtitle { margin: 12px 0 17px; color: var(--adv-muted); font-size: 12px; line-height: 1.8; }
@@ -21,22 +21,35 @@
 .adventure-panel button { cursor: pointer; }
 .adventure-panel-status { margin: 12px 0 0; color: #427259; font-size: 12px; line-height: 1.8; overflow-wrap: anywhere; }
 .adventure-panel-status:empty { display: none; }
-.adventure-book-progress { margin-bottom: 8px; }
-.adventure-book-progress > span { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 9px; color: var(--adv-muted); font-size: 12px; }
-.adventure-book-progress strong { color: var(--adv-ink); font-size: 18px; font-weight: 500; }
-.adventure-book-progress progress { display: block; width: 100%; height: 3px; border: 0; background: var(--adv-line); accent-color: #688aa0; }
+.adventure-book-intro { display: grid; grid-template-columns: minmax(0, 1fr) 164px; align-items: center; gap: 18px; margin: 0 0 18px; }
+.adventure-page-label { color: var(--adv-muted); font-size: 10px; letter-spacing: .07em; }
+.adventure-book-intro p { margin: 8px 0 0; font-size: 12px; line-height: 1.9; }
+.adventure-book-photo { margin: 0 2px 0 0; padding: 5px 5px 0; background: #fffdf5; border: 1px solid #d8d0c0; box-shadow: 1px 2px 3px #54483012; transform: rotate(1.5deg); }
+.adventure-book-photo img { display: block; width: 100%; height: auto; aspect-ratio: 2; object-fit: cover; }
+.adventure-book-photo figcaption { padding: 4px 2px; color: #7b7464; font-size: 9px; line-height: 1.7; text-align: center; }
+.adventure-book-progress { margin-bottom: 13px; }
+.adventure-book-progress > span { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; color: var(--adv-muted); font-size: 11px; }
+.adventure-book-progress strong { color: var(--adv-ink); font: 16px/1.5 Consolas, monospace; }
+.adventure-book-progress progress { display: block; width: 100%; height: 3px; border: 0; background: var(--adv-line); accent-color: #8f9275; }
 .adventure-book-progress progress::-webkit-progress-bar { background: var(--adv-line); }
-.adventure-book-progress progress::-webkit-progress-value { background: #688aa0; }
-.adventure-stamps { display: grid; grid-template-columns: 1fr 1fr; column-gap: 23px; }
-.adventure-stamp { display: flex; gap: 10px; padding: 14px 0; border-bottom: 1px solid var(--adv-line); }
+.adventure-book-progress progress::-webkit-progress-value { background: #8f9275; }
+.adventure-book-progress progress::-moz-progress-bar { background: #8f9275; }
+.adventure-stamps { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 11px 14px; }
+.adventure-stamp { display: flex; gap: 9px; min-width: 0; padding: 11px 10px 1px; border: 1px solid var(--adv-line); background: #fffdf7; }
 .adventure-stamp > div { flex: 1; min-width: 0; }
-.adventure-stamp-icon { flex: 0 0 21px; color: #85929b; font-size: 18px; line-height: 1.6; text-align: center; }
+.adventure-stamp-icon { flex: 0 0 22px; margin-top: 2px; color: #949080; font-size: 20px; line-height: 1.3; text-align: center; }
+.adventure-stamp-heading { display: flex; align-items: baseline; gap: 6px; }
+.adventure-stamp-number { flex-shrink: 0; color: #979181; font: 9px/1.6 Consolas, monospace; }
 .adventure-stamp h3 { margin: 0 0 4px; color: inherit; font-size: 13px; line-height: 1.6; font-weight: 500; }
 .adventure-stamp p { margin: 0; color: var(--adv-muted); font-size: 11px; line-height: 1.8; }
-.adventure-stamp [data-entry-state] { display: block; margin-top: 5px; color: var(--adv-muted); font-size: 10px; }
-.adventure-stamp.is-found :is(.adventure-stamp-icon, [data-entry-state]) { color: #458065; }
+.adventure-stamp-foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0 8px; margin-top: 3px; }
+.adventure-stamp [data-entry-state] { flex-shrink: 0; color: var(--adv-muted); font-size: 10px; }
+.adventure-stamp.is-found :is(.adventure-stamp-icon, [data-entry-state]) { color: #648569; }
 .adventure-stamp.is-found [data-entry-state]::before { content: '✓ '; }
-.adventure-book-footer { display: flex; flex-wrap: wrap; gap: 0 16px; align-items: center; padding: 6px 0; border-bottom: 1px solid var(--adv-line); }
+.adventure-entry-link { display: inline-flex; align-items: center; justify-content: flex-end; min-height: 44px; max-width: 100%; margin-left: auto; padding: 6px 0; border: 0; background: transparent; color: var(--adv-accent); font: inherit; font-size: 11px; line-height: 1.7; text-align: right; text-decoration: underline; text-underline-offset: 3px; }
+.adventure-entry-link:hover { color: var(--adv-ink); }
+.adventure-book-footer { display: flex; flex-wrap: wrap; gap: 0 16px; align-items: center; margin-top: 15px; padding: 5px 0 0; border-top: 1px solid var(--adv-line); }
+.adventure-book-footer > span { color: var(--adv-muted); font-size: 11px; }
 .adventure-secondary { min-height: 44px; padding: 8px 0; border: 0; background: transparent; color: var(--adv-accent); font-size: 12px; text-decoration: underline; text-underline-offset: 4px; }
 .adventure-secondary:hover, .adventure-sos-edit:hover, .adventure-anime-next:hover { color: var(--adv-ink); }
 .adventure-book-footer a { display: inline-flex; align-items: center; min-height: 44px; color: var(--adv-accent); font-size: 12px; line-height: 1.7; }
@@ -60,10 +73,26 @@
 .adventure-sos-photo { margin: 0; }
 .adventure-sos-photo img { display: block; width: 100%; height: auto; aspect-ratio: 2; border-radius: 3px; object-fit: cover; }
 .adventure-sos-photo figcaption { margin-top: 7px; color: var(--adv-muted); font-size: 10px; line-height: 1.8; }
-.adventure-konata { position: relative; margin: 17px 0; padding: 11px 0 11px 13px; border-left: 2px solid #b9cbd7; }
-.adventure-konata-speaker { color: var(--adv-accent); font-size: 11px; }
-.adventure-konata-line { margin: 7px 0 2px; font-size: 13px; line-height: 1.9; }
+.adventure-club-notes { margin: 18px 0 0; }
+.adventure-club-notes-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 12px; margin: 0 0 8px; }
+.adventure-club-notes-head h3 { margin: 0; color: inherit; font-family: "Noto Serif SC", "Songti SC", SimSun, serif; font-size: 15px; font-weight: 500; line-height: 1.8; }
+.adventure-club-notes-head > span { color: var(--adv-muted); font-size: 10px; }
+.adventure-character-list { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px 8px; }
+.adventure-character { display: flex; align-items: center; gap: 7px; min-width: 0; min-height: 60px; padding: 7px 4px; border: 0; border-bottom: 2px solid transparent; background: transparent; color: var(--adv-muted); font-size: 11px; line-height: 1.6; text-align: left; }
+.adventure-character:hover { background: var(--adv-soft); }
+.adventure-character.is-selected { border-bottom-color: #b39977; background: #eee7d8; color: var(--adv-ink); }
+.adventure-character-portrait { display: block; flex-shrink: 0; width: 44px; height: 44px; border: 1px solid var(--adv-line); border-radius: 3px; background-color: var(--adv-soft); background-image: url('/img/easter-eggs/classic-girls-portraits.webp'); background-size: 400% 200%; background-position: var(--portrait-x, 33.333%) var(--portrait-y, 0%); background-repeat: no-repeat; }
+.adventure-character-name { min-width: 0; overflow-wrap: anywhere; }
+.adventure-konata { display: flex; align-items: flex-start; gap: 12px; margin: 14px 0 0; padding: 13px 12px 2px; border: 1px solid var(--adv-line); background: var(--adv-soft); }
+.adventure-note-portrait { width: 54px; height: 54px; margin-top: 1px; }
+.adventure-note-copy { flex: 1; min-width: 0; }
+.adventure-konata-speaker { color: var(--adv-accent); font-size: 11px; line-height: 1.8; }
+.adventure-konata-speaker strong { font-weight: 500; }
+.adventure-konata-speaker small { display: block; color: var(--adv-muted); font-size: 9px; line-height: 1.7; }
+.adventure-konata-line { min-height: 48px; margin: 8px 0 0; font-size: 13px; line-height: 1.9; overflow-wrap: anywhere; }
 .adventure-anime-next { min-height: 44px; padding: 6px 0; border: 0; background: transparent; color: var(--adv-muted); font-size: 11px; }
+.adventure-room-links { display: flex; flex-wrap: wrap; align-items: center; gap: 0 20px; margin: 3px 0 14px; }
+.adventure-room-links a { display: inline-flex; align-items: center; min-height: 44px; color: var(--adv-accent); font-size: 12px; line-height: 1.7; }
 .adventure-sos-form { margin: 0; padding-top: 16px; border-top: 1px solid var(--adv-line); }
 .adventure-sos-form h3, .adventure-sos-receipt h3 { margin: 0; color: inherit; font-size: 15px; font-weight: 500; line-height: 1.7; }
 .adventure-sos-note { margin: 5px 0 13px; color: var(--adv-muted); font-size: 11px; line-height: 1.8; }
@@ -98,7 +127,7 @@
 .adventure-terminal-form input { flex: 1; min-width: 0; min-height: 44px; padding: 5px; border: 0; border-radius: 2px; background: transparent; color: #e2ece5; font: 12px/1.5 Consolas, monospace; }
 .adventure-terminal-form button { min-height: 44px; padding: 7px 10px; border: 1px solid #677678; border-radius: 3px; background: #25363d; color: #e0d0b6; font-size: 12px; }
 .adventure-terminal-shortcuts { display: flex; flex-wrap: wrap; align-items: center; gap: 0 16px; padding-top: 6px; }
-.adventure-terminal-shortcuts button { min-height: 44px; padding: 6px 0; border: 0; background: transparent; color: var(--adv-accent); font: 11px/1.5 Consolas, monospace; }
+.adventure-terminal-shortcuts button { min-width: 44px; min-height: 44px; padding: 6px 0; border: 0; background: transparent; color: var(--adv-accent); font: 11px/1.5 Consolas, monospace; }
 .adventure-wish-sky { padding-bottom: 17px; border: 1px solid var(--adv-line); background: var(--adv-paper); text-align: center; }
 .adventure-wish-picture { display: block; width: 100%; height: 145px; object-fit: cover; object-position: 50% 37%; }
 .adventure-wish-result { min-height: 145px; padding: 19px 20px 5px; }
@@ -112,7 +141,12 @@
 .adventure-wish-button:disabled { opacity: .6; cursor: wait; }
 .adventure-wish-note { margin: 12px 0 0; color: var(--adv-muted); font-size: 11px; line-height: 1.8; }
 [data-theme='dark'] .adventure-toast { background: #252b30f5; border-color: #53606a; color: #b6ccd9; }
-[data-theme='dark'] .adventure-dialog { --adv-ink: #e0e5e9; --adv-muted: #b0bac2; --adv-accent: #9ec0d8; --adv-line: #444e55; --adv-soft: #30383e; --adv-paper: #242b30; border-color: #5b6871; }
+[data-theme='dark'] .adventure-dialog { --adv-ink: #e0dace; --adv-muted: #bcb3a6; --adv-accent: #dbc4a5; --adv-line: #514a41; --adv-soft: #35312c; --adv-paper: #2b2824; border-color: #766c60; }
+[data-theme='dark'] .adventure-stamp { background: #302c26; }
+[data-theme='dark'] .adventure-stamp-number { color: #b5a998; }
+[data-theme='dark'] .adventure-character.is-selected { background: #443a2d; border-bottom-color: #c6ad88; }
+[data-theme='dark'] .adventure-book-photo { background: #dbd0bb; border-color: #b6a88e; }
+[data-theme='dark'] .adventure-book-photo figcaption { color: #625947; }
 [data-theme='dark'] .adventure-stamp.is-found :is(.adventure-stamp-icon, [data-entry-state]) { color: #9bcbb0; }
 [data-theme='dark'] .adventure-reward { background: #292d2e; border-color: #464b49; color: #d6d8cf; }
 [data-theme='dark'] :is(.adventure-letter-sign, .adventure-letter-note) { color: #a9b0a7; }
@@ -121,5 +155,31 @@
 [data-theme='dark'] .adventure-sos-receipt { background: #352f29; border-color: #998575; color: #e5d5c5; }
 [data-theme='dark'] .adventure-sos-receipt :is(.adventure-sos-approval, .adventure-sos-edit) { color: #d5b79e; }
 [data-theme='dark'] .adventure-wish-result.is-gold :is(.adventure-wish-rarity, h3) { color: #e3c386; }
-@media (max-width: 500px) { .adventure-footer-corners { column-gap: 10px; font-size: 11px; } .adventure-dialog { width: calc(100vw - 22px); max-width: calc(100vw - 22px); max-height: calc(100dvh - 24px); } .adventure-panel { padding: 15px 13px; } .adventure-panel-head h2 { font-size: 18px; } .adventure-stamps { grid-template-columns: 1fr; } .adventure-stamp { padding: 12px 0; } .adventure-sos-fields { grid-template-columns: 1fr; gap: 10px; } .adventure-sos-local { display: block; margin-left: 0; } .adventure-lab-scene img { height: 145px; } .adventure-lab-scene output { font-size: 21px; } .adventure-terminal-output { height: 190px; padding: 11px; font-size: 11px; } .adventure-terminal-form { padding: 7px; gap: 5px; } .adventure-terminal-form input { font-size: 11px; } .adventure-wish-picture { height: 120px; } .adventure-wish-result { min-height: 155px; padding: 15px 13px 5px; } .adventure-wish-result h3 { font-size: 17px; } }
+@media (max-width: 500px) {
+  .adventure-footer-corners { column-gap: 10px; font-size: 11px; }
+  .adventure-dialog { width: calc(100vw - 22px); max-width: calc(100vw - 22px); max-height: calc(100dvh - 24px); }
+  .adventure-panel { padding: 15px 13px; }
+  .adventure-panel-head h2 { font-size: 18px; }
+  .adventure-book-intro { grid-template-columns: minmax(0, 1fr) 112px; gap: 10px; margin-bottom: 15px; }
+  .adventure-book-intro p { font-size: 11px; }
+  .adventure-book-photo { padding: 4px 4px 0; }
+  .adventure-book-photo figcaption { font-size: 8px; }
+  .adventure-stamps { grid-template-columns: minmax(0, 1fr); gap: 8px; }
+  .adventure-stamp { padding: 11px 10px 1px; }
+  .adventure-character-list { gap: 5px; }
+  .adventure-character { flex-direction: column; justify-content: center; gap: 4px; padding: 6px 2px; font-size: 10px; text-align: center; }
+  .adventure-note-portrait { width: 44px; height: 44px; }
+  .adventure-konata { gap: 9px; padding: 11px 9px 1px; }
+  .adventure-konata-line { font-size: 12px; }
+  .adventure-sos-fields { grid-template-columns: 1fr; gap: 10px; }
+  .adventure-sos-local { display: block; margin-left: 0; }
+  .adventure-lab-scene img { height: 145px; }
+  .adventure-lab-scene output { font-size: 21px; }
+  .adventure-terminal-output { height: 190px; padding: 11px; font-size: 11px; }
+  .adventure-terminal-form { padding: 7px; gap: 5px; }
+  .adventure-terminal-form input { font-size: 11px; }
+  .adventure-wish-picture { height: 120px; }
+  .adventure-wish-result { min-height: 155px; padding: 15px 13px 5px; }
+  .adventure-wish-result h3 { font-size: 17px; }
+}
 @media (prefers-reduced-motion: reduce) { .adventure-launcher, .adventure-toast, .adventure-dialog * { transition: none !important; animation: none !important; } }
