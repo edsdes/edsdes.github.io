@@ -35,18 +35,18 @@
       return new Set(Array.isArray(data?.found) ? data.found.filter(id => ids.includes(id)) : []);
     } catch (_) { return new Set(); }
   }
-  function readSOS() {
+  function readSOS(fallback = null) {
     try {
       const saved = JSON.parse(localStorage.getItem(SOS_KEY) || 'null');
       if (!saved || typeof saved.name !== 'string' || !saved.name.trim() || saved.name.length > 20 || !Object.hasOwn(roles, saved.role) || !/^\d{4}$/.test(saved.number) || !/^\d{4}\.\d{2}\.\d{2}$/.test(saved.date)) return null;
       return { name: saved.name, role: saved.role, number: saved.number, date: saved.date };
-    } catch (_) { return null; }
+    } catch (_) { return fallback; }
   }
-  function readLab() {
+  function readLab(fallback = { worldline: worldlines[0], mail: '' }) {
     try {
       const saved = JSON.parse(localStorage.getItem(LAB_KEY) || '{}');
       return { worldline: worldlines.includes(saved?.worldline) ? saved.worldline : worldlines[0], mail: typeof saved?.mail === 'string' ? saved.mail.slice(0, 100) : '' };
-    } catch (_) { return { worldline: worldlines[0], mail: '' }; }
+    } catch (_) { return fallback; }
   }
   let lab = readLab(), membership = readSOS(), labSaved = true, membershipSaved = true;
   function saveLab() {
@@ -139,9 +139,9 @@
     return dialog;
   }
   function openBook() {
-    const dialog = panel('book', '彩蛋簿', '小站里的八处小地方，路过就留一枚章。');
+    const dialog = panel('book', '彩蛋簿', '找齐八个，有封信和一张纪念卡。');
     const body = dialog.querySelector('.adventure-panel-body');
-    body.innerHTML = '<div class="adventure-book-intro"><div><span class="adventure-page-label">部室杂记 / 01</span><p>文章之外，还有几处可以坐坐。<br>找齐八枚，就能收下最后那封信。</p></div><figure class="adventure-book-photo"><img src="/img/easter-eggs/classic-club-afternoon.webp" alt="长门、美琴、梓和黑猫在部室喝下午茶" width="1536" height="864" loading="lazy" decoding="async"><figcaption>茶还没凉，慢慢逛。</figcaption></figure></div><div class="adventure-book-progress"><span>探索记录 <strong data-book-count></strong></span><progress max="8" value="0" aria-label="彩蛋收集进度"></progress></div><div class="adventure-stamps" aria-label="八枚彩蛋记录"></div><nav class="adventure-book-footer" aria-label="部室入口"><span>歇一会儿：</span><button type="button" class="adventure-secondary" data-open-anime>SOS 团部室</button><button type="button" class="adventure-secondary" data-open-wish>抽张纸条</button></nav><section class="adventure-reward" hidden><h3>留在最后的一封信</h3><details><summary>拆开这封信</summary><p class="adventure-letter-message"></p><p class="adventure-letter-sign">—— 无敌马的小窝</p></details><div class="adventure-reward-actions"><button type="button" class="adventure-secondary" data-open-keepsake>收下纪念卡 ↗</button><button type="button" class="adventure-secondary" data-reward-wish>看看金色便签</button></div><p class="adventure-letter-note">还有一张部室合照和限定金色便签，可以一起收下。</p></section><p class="adventure-local-note">记录存在当前浏览器里。</p>';
+    body.innerHTML = '<div class="adventure-book-intro"><div class="adventure-book-memo"><p>没找到的，可以从这里过去。</p><div class="adventure-book-progress"><span>已找到 <strong data-book-count></strong></span><progress class="adventure-sr-only" max="8" value="0" aria-label="彩蛋收集进度"></progress></div></div><button type="button" class="adventure-book-visitor" data-open-anime><img src="/img/easter-eggs/konata-room-cutout.webp" alt="此方拿着掌机和饼干坐在部室里" width="667" height="1000" decoding="async"><span>去部室坐坐 →</span></button></div><div class="adventure-stamps" aria-label="八枚彩蛋记录"></div><nav class="adventure-book-footer" aria-label="部室入口"><span>歇一会儿：</span><button type="button" class="adventure-secondary" data-open-anime>SOS 团部室</button><button type="button" class="adventure-secondary" data-open-wish>抽张纸条</button></nav><section class="adventure-reward" hidden><h3>留在最后的一封信</h3><details><summary>拆开这封信</summary><p class="adventure-letter-message"></p><p class="adventure-letter-sign">—— 无敌马的小窝</p></details><div class="adventure-reward-actions"><button type="button" class="adventure-secondary" data-open-keepsake>收下纪念卡 ↗</button><button type="button" class="adventure-secondary" data-reward-wish>看看金色便签</button></div><p class="adventure-letter-note">还有一张部室合照和限定金色便签，可以一起收下。</p></section><p class="adventure-local-note">记录存在当前浏览器里。</p>';
     body.querySelector('.adventure-letter-message').textContent = greeting;
     body.querySelector('[data-open-keepsake]').addEventListener('click', openKeepsake);
     body.querySelector('[data-reward-wish]').addEventListener('click', () => {
@@ -150,13 +150,12 @@
       activeDialog.querySelector('[data-wish]').click();
     });
     const stamps = body.querySelector('.adventure-stamps');
-    entries.forEach((entry, index) => {
+    entries.forEach(entry => {
       const item = document.createElement('article');
       item.className = 'adventure-stamp';
       item.dataset.discovery = entry.id;
-      item.innerHTML = '<span class="adventure-stamp-icon" aria-hidden="true"></span><div><div class="adventure-stamp-heading"><span class="adventure-stamp-number" aria-hidden="true"></span><h3></h3></div><p></p><div class="adventure-stamp-foot"><span data-entry-state></span></div></div>';
+      item.innerHTML = '<span class="adventure-stamp-icon" aria-hidden="true"></span><div><div class="adventure-stamp-heading"><h3></h3></div><p></p><div class="adventure-stamp-foot"><span data-entry-state></span></div></div>';
       item.querySelector('.adventure-stamp-icon').textContent = entry.icon;
-      item.querySelector('.adventure-stamp-number').textContent = String(index + 1).padStart(2, '0');
       item.querySelector('p').textContent = entry.hint;
       const action = document.createElement(entry.panel ? 'button' : 'a');
       action.className = 'adventure-entry-link';
@@ -190,7 +189,7 @@
       stamps.append(item);
     });
     body.querySelector('[data-open-wish]').addEventListener('click', openWish);
-    body.querySelector('[data-open-anime]').addEventListener('click', openAnime);
+    body.querySelectorAll('[data-open-anime]').forEach(button => button.addEventListener('click', openAnime));
     sync();
     dialog.querySelector('.adventure-close').focus({ preventScroll: true });
   }
@@ -210,7 +209,7 @@
     const retry = body.querySelector('[data-keepsake-retry]');
     const status = dialog.querySelector('.adventure-panel-status');
     const controller = new AbortController();
-    const savedMembership = membershipSaved ? readSOS() : membership;
+    const savedMembership = membershipSaved ? readSOS(membership) : membership;
     const recipient = savedMembership?.name || '来小站做客的你';
     const now = new Date();
     const date = [now.getFullYear(), String(now.getMonth() + 1).padStart(2, '0'), String(now.getDate()).padStart(2, '0')].join('.');
@@ -338,17 +337,47 @@
     body.querySelector('[data-sos-date]').textContent = saved.date;
   }
   function openAnime() {
-    const dialog = panel('anime', 'SOS 团 · 临时部室', '今天也没正经开会。桌上倒是多了几张留言。');
+    const dialog = panel('anime', 'SOS 团 · 临时部室', '今天也没正经开会。');
     const body = dialog.querySelector('.adventure-panel-body');
-    if (membershipSaved) membership = readSOS();
-    body.innerHTML = '<figure class="adventure-sos-photo"><img src="/img/easter-eggs/sos-clubroom.webp" alt="春日和此方在午后的部室，一边看 CTF 资料一边摸鱼" width="1536" height="768" loading="lazy" decoding="async"><figcaption>部室记录 / 今天的议题：为什么假期总是过得那么快</figcaption></figure><section class="adventure-club-notes" aria-labelledby="adventure-club-notes-title"><div class="adventure-club-notes-head"><h3 id="adventure-club-notes-title">部室留言</h3><span>看看谁留了字条</span></div><div class="adventure-character-list" role="group" aria-label="选择留言角色"></div><div class="adventure-konata"><span class="adventure-note-portrait adventure-character-portrait" aria-hidden="true"></span><div class="adventure-note-copy"><div class="adventure-konata-speaker"><strong data-character-speaker></strong><small data-character-work></small></div><p class="adventure-konata-line" aria-live="polite"></p><button type="button" class="adventure-anime-next">换张便签 ↻</button></div></div></section><nav class="adventure-room-links" aria-label="从部室出发"><button type="button" class="adventure-secondary" data-back-book>翻开彩蛋簿</button><a href="/play/arcade/">去摸鱼角 →</a></nav><form class="adventure-sos-form"><h3>入团登记</h3><p class="adventure-sos-note">宇宙人、未来人、异世界人，以及今晚还没写 WP 的人。</p><div class="adventure-sos-fields"><label for="adventure-sos-name">怎么称呼你<input id="adventure-sos-name" name="name" maxlength="20" required placeholder="路过的阿宅" autocomplete="nickname"></label><label for="adventure-sos-role">部室分工<select id="adventure-sos-role" name="role"><option value="debug">找 bug 的</option><option value="writeup">写 WP 的</option><option value="game">负责摸鱼的</option><option value="observe">观测世界线的</option></select></label></div><button type="submit" class="adventure-secondary adventure-sos-submit" data-sos-join>交给团长</button><span class="adventure-sos-local">登记只保存在你的浏览器里。</span></form><section class="adventure-sos-receipt" hidden aria-live="polite"><div class="adventure-sos-receipt-head"><h3>临时团员证</h3><span data-sos-number></span></div><p><strong data-sos-name></strong><span> / </span><span data-sos-role></span></p><p class="adventure-sos-approval">批准。下次开会记得带点零食。</p><div class="adventure-sos-receipt-foot"><time data-sos-date></time><button type="button" class="adventure-sos-edit">重新填表</button></div></section>';
+    if (membershipSaved) membership = readSOS(membership);
+    body.innerHTML = "<figure class=\"adventure-sos-photo\"><div class=\"adventure-room-photo\"><img src=\"/img/easter-eggs/classic-club-afternoon.webp\" alt=\"长门在左边读书，美琴、梓和黑猫围桌喝茶；桌上有电脑和点心，后面靠着吉他\" width=\"1536\" height=\"864\" decoding=\"async\"><div class=\"adventure-room-objects\" role=\"group\" aria-label=\"部室里的小物件\"></div></div><figcaption>桌上的东西可以点。点心记得分着吃。</figcaption></figure><section class=\"adventure-club-notes\" aria-labelledby=\"adventure-club-notes-title\"><h3 id=\"adventure-club-notes-title\" class=\"adventure-sr-only\">部室闲聊</h3><div class=\"adventure-character-list\" role=\"group\" aria-label=\"和谁聊两句\"></div><div class=\"adventure-konata\"><span class=\"adventure-note-portrait adventure-character-portrait\" aria-hidden=\"true\"></span><div class=\"adventure-note-copy\"><div class=\"adventure-konata-speaker\"><strong data-character-speaker></strong><small data-character-work></small></div><p class=\"adventure-konata-line\" aria-live=\"polite\"></p><div class=\"adventure-room-response\"><button type=\"button\" class=\"adventure-secondary\" data-room-action hidden></button><span data-room-detail></span><button type=\"button\" class=\"adventure-anime-next\">聊点别的</button></div></div></div></section><nav class=\"adventure-room-links\" aria-label=\"从部室出发\"><button type=\"button\" class=\"adventure-secondary\" data-back-book>翻开彩蛋簿</button><a href=\"/play/arcade/\">去摸鱼角 →</a></nav><details class=\"adventure-registration\"><summary>入团登记 / 团员证</summary><form class=\"adventure-sos-form\"><h3>入团登记</h3><p class=\"adventure-sos-note\">宇宙人、未来人、异世界人，以及今晚还没写 WP 的人。</p><div class=\"adventure-sos-fields\"><label for=\"adventure-sos-name\">怎么称呼你<input id=\"adventure-sos-name\" name=\"name\" maxlength=\"20\" required placeholder=\"路过的阿宅\" autocomplete=\"nickname\"></label><label for=\"adventure-sos-role\">部室分工<select id=\"adventure-sos-role\" name=\"role\"><option value=\"debug\">找 bug 的</option><option value=\"writeup\">写 WP 的</option><option value=\"game\">负责摸鱼的</option><option value=\"observe\">观测世界线的</option></select></label></div><button type=\"submit\" class=\"adventure-secondary adventure-sos-submit\" data-sos-join>交给团长</button><span class=\"adventure-sos-local\">登记只保存在你的浏览器里。</span></form><section class=\"adventure-sos-receipt\" hidden aria-live=\"polite\"><div class=\"adventure-sos-receipt-head\"><h3>临时团员证</h3><span data-sos-number></span></div><p><strong data-sos-name></strong><span> / </span><span data-sos-role></span></p><p class=\"adventure-sos-approval\">批准。下次开会记得带点零食。</p><div class=\"adventure-sos-receipt-foot\"><time data-sos-date></time><button type=\"button\" class=\"adventure-sos-edit\">重新填表</button></div></section></details>";
     const characters = body.querySelector('.adventure-character-list');
     const notePortrait = body.querySelector('.adventure-note-portrait');
     const line = body.querySelector('.adventure-konata-line');
+    const action = body.querySelector('[data-room-action]');
+    const detail = body.querySelector('[data-room-detail]');
     const noteIndexes = clubCharacters.map(() => 0);
-    let selectedCharacter = 1;
-    function showCharacter(index) {
+    const treatsGiven = clubCharacters.map(() => 0);
+    let selectedCharacter = 1, scene = 'notes', biscuits = 3, pages = 0, cups = 0, riffs = 0, audio = null, audioBusy = false, audioTimer;
+    const objects = [
+      { id: 'book', name: '书', label: '翻翻长门的书', x: '20%', y: '54%' },
+      { id: 'tea', name: '茶', label: '看看黑猫的茶杯', x: '84%', y: '40%' },
+      { id: 'computer', name: '电脑', label: '看看桌上的电脑', x: '52%', y: '50%' },
+      { id: 'guitar', name: '吉他', label: '看看梓的吉他', x: '75%', y: '36%' },
+      { id: 'snack', name: '点心', label: '分一分桌上的点心', x: '49%', y: '65%' }
+    ];
+    const treatReplies = {
+      haruhi: ['我那块要大一点。团长负责分配嘛。', '剩下的先留着，待会儿还有人来。'],
+      konata: ['谢啦。这样就不用放下手柄了。', '三块的话，是不是一人一块、我两块？'],
+      kurisu: ['谢了。我没说要配 Dr Pepper。', '先别给我了，去看看其他人有没有拿到。'],
+      yuki: ['谢谢。', '这页看完再吃。'],
+      mikoto: ['给我？那我就不客气了。', '剩下那块留给还没吃的人吧。'],
+      azusa: ['吃完这一块就练习。说好了哦。', '又吃一块的话，练习要拖到什么时候啊。'],
+      kuroneko: ['既然是你的心意，我就收下了。', '再吃一块……只是因为茶还没喝完。'],
+      saber: ['谢谢。很好吃。', '还有吗？']
+    };
+    function setAction() {
+      action.hidden = scene === 'notes';
+      action.disabled = scene === 'guitar' && audioBusy;
+      const titles = { book: '再翻一页', tea: '再倒一杯', computer: '打开终端', guitar: '听两下 ♪', snack: biscuits ? '递给' + clubCharacters[selectedCharacter].name + '一块' : '再添一盘' };
+      action.textContent = titles[scene] || '';
+      action.setAttribute('aria-label', scene === 'guitar' ? '弹几下吉他，会播放声音' : action.textContent);
+      detail.textContent = scene === 'snack' ? '盘里还剩 ' + biscuits + ' 块' : '';
+      body.querySelectorAll('[data-room-object]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.roomObject === scene)));
+    }
+    function showCharacter(index, nextScene = 'notes', text) {
       selectedCharacter = index;
+      scene = nextScene;
       const character = clubCharacters[index];
       characters.querySelectorAll('[data-character]').forEach(button => {
         const selected = button.dataset.character === character.id;
@@ -357,9 +386,10 @@
       });
       notePortrait.style.setProperty('--portrait-x', character.x);
       notePortrait.style.setProperty('--portrait-y', character.y);
-      body.querySelector('[data-character-speaker]').textContent = character.name + '的便签';
+      body.querySelector('[data-character-speaker]').textContent = character.name;
       body.querySelector('[data-character-work]').textContent = character.work;
-      line.textContent = character.notes[noteIndexes[index]];
+      line.textContent = text === undefined ? character.notes[noteIndexes[index]] : text;
+      setAction();
     }
     clubCharacters.forEach((character, index) => {
       const button = document.createElement('button');
@@ -367,22 +397,108 @@
       button.className = 'adventure-character';
       button.dataset.character = character.id;
       button.setAttribute('aria-pressed', 'false');
-      button.setAttribute('aria-label', '看' + character.name + '的留言');
+      button.setAttribute('aria-label', '和' + character.name + '聊两句');
       button.innerHTML = '<span class="adventure-character-portrait" aria-hidden="true"></span><span class="adventure-character-name"></span>';
       button.querySelector('.adventure-character-portrait').style.setProperty('--portrait-x', character.x);
       button.querySelector('.adventure-character-portrait').style.setProperty('--portrait-y', character.y);
       button.querySelector('.adventure-character-name').textContent = character.name;
-      button.addEventListener('click', () => showCharacter(index));
+      button.addEventListener('click', () => showCharacter(index, scene === 'snack' ? 'snack' : 'notes'));
       button.addEventListener('keydown', event => {
-        const offsets = { ArrowLeft: -1, ArrowRight: 1, ArrowUp: -4, ArrowDown: 4 };
+        const narrow = window.matchMedia('(max-width: 500px)').matches;
+        const offsets = { ArrowLeft: -1, ArrowRight: 1, ArrowUp: narrow ? -4 : -1, ArrowDown: narrow ? 4 : 1 };
         if (!Object.hasOwn(offsets, event.key) && event.key !== 'Home' && event.key !== 'End') return;
         event.preventDefault();
         const next = event.key === 'Home' ? 0 : event.key === 'End' ? clubCharacters.length - 1 : (index + offsets[event.key] + clubCharacters.length) % clubCharacters.length;
-        showCharacter(next);
+        showCharacter(next, scene === 'snack' ? 'snack' : 'notes');
         characters.children[next].focus({ preventScroll: true });
       });
       characters.append(button);
     });
+    objects.forEach(object => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'adventure-room-object';
+      button.dataset.roomObject = object.id;
+      button.style.setProperty('--object-x', object.x);
+      button.style.setProperty('--object-y', object.y);
+      button.setAttribute('aria-label', object.label);
+      button.setAttribute('aria-pressed', 'false');
+      const label = document.createElement('span');
+      label.textContent = object.name;
+      button.append(label);
+      button.addEventListener('click', () => {
+        if (object.id === 'book') showCharacter(3, 'book', '这本还没看完。书签别拿走。');
+        if (object.id === 'tea') showCharacter(6, 'tea', '茶刚泡好。端的时候当心一点。');
+        if (object.id === 'computer') showCharacter(2, 'computer', '电脑可以用。隐藏的文件，用普通列表是看不到的。');
+        if (object.id === 'guitar') showCharacter(5, 'guitar', '那个不是摆设。今天还没练呢。');
+        if (object.id === 'snack') showCharacter(selectedCharacter, 'snack', biscuits ? '点心在桌上。你想先留给谁？' : '……盘子已经空了。');
+      });
+      body.querySelector('.adventure-room-objects').append(button);
+    });
+    async function strum() {
+      const Audio = window.AudioContext || window.webkitAudioContext;
+      if (!Audio) return false;
+      try {
+        if (!audio) audio = new Audio();
+        if (audio.state === 'suspended') {
+          let timer;
+          try { await Promise.race([audio.resume(), new Promise(resolve => { timer = setTimeout(resolve, 400); })]); }
+          finally { clearTimeout(timer); }
+        }
+        if (!dialog.open || scene !== 'guitar' || audio.state !== 'running') return false;
+        const frequencies = [329.63, 392, 440, riffs % 2 ? 392 : 523.25];
+        frequencies.forEach((frequency, index) => {
+          const start = audio.currentTime + index * .14;
+          const oscillator = audio.createOscillator(), gain = audio.createGain();
+          oscillator.type = 'triangle';
+          oscillator.frequency.value = frequency;
+          gain.gain.setValueAtTime(0, start);
+          gain.gain.linearRampToValueAtTime(.045, start + .007);
+          gain.gain.exponentialRampToValueAtTime(.001, start + .2);
+          oscillator.connect(gain);
+          gain.connect(audio.destination);
+          oscillator.start(start);
+          oscillator.stop(start + .21);
+          oscillator.onended = () => { oscillator.disconnect(); gain.disconnect(); };
+        });
+        return true;
+      } catch (_) { return false; }
+    }
+    action.addEventListener('click', async () => {
+      if (scene === 'computer') { openTerminal(); return; }
+      if (scene === 'book') {
+        const lines = ['书签后夹着一张借书卡。看完记得还。', '这一页写着：ls -a。边上的字很小。', '再往后翻，是两页空白。长门把书拿回去了。'];
+        showCharacter(3, 'book', lines[pages++ % lines.length]);
+      } else if (scene === 'tea') {
+        const lines = ['杯子满了。先喝这一杯吧。', '又添了一点茶。今天的茶会看来是结束不了了。', '茶壶空了。这次轮到你去接水。'];
+        showCharacter(6, 'tea', lines[cups++ % lines.length]);
+      } else if (scene === 'guitar') {
+        if (audioBusy) return;
+        audioBusy = true;
+        setAction();
+        clearTimeout(audioTimer);
+        const played = await strum();
+        if (!dialog.open) { audioBusy = false; return; }
+        if (played) audioTimer = setTimeout(() => { audioBusy = false; if (dialog.open) setAction(); }, 900);
+        riffs++;
+        if (dialog.open && scene === 'guitar') showCharacter(5, 'guitar', played ? (riffs % 2 ? '嗯，这次调对了。\n……既然拿起来了，就多练一会儿吧。' : '美琴跟着敲了两下桌子。\n今天总算有点社团活动的样子了。') : '今天先轻轻练指法。声音没开也没关系。');
+        if (!played) { clearTimeout(audioTimer); audioBusy = false; if (dialog.open) setAction(); }
+      } else if (scene === 'snack') {
+        if (!biscuits) {
+          biscuits = 3;
+          treatsGiven.fill(0);
+          showCharacter(selectedCharacter, 'snack', '又添了三块。这次慢点分。');
+          return;
+        }
+        biscuits--;
+        const character = clubCharacters[selectedCharacter];
+        const count = treatsGiven[selectedCharacter]++;
+        const replies = treatReplies[character.id];
+        const response = character.id === 'saber' && count >= 2 ? '点心很不错。晚饭呢？' : replies[Math.min(count, replies.length - 1)];
+        showCharacter(selectedCharacter, 'snack', response);
+      }
+    });
+    dialog.addEventListener('close', () => { clearTimeout(audioTimer); audioBusy = false; if (audio && audio.state !== 'closed') void audio.close().catch(() => {}); }, { once: true });
     body.querySelector('.adventure-anime-next').addEventListener('click', () => {
       noteIndexes[selectedCharacter] = (noteIndexes[selectedCharacter] + 1) % clubCharacters[selectedCharacter].notes.length;
       showCharacter(selectedCharacter);
@@ -414,12 +530,13 @@
       name.focus({ preventScroll: true });
     });
     renderMembership(body);
+    body.querySelector('.adventure-registration').open = !!membership;
     dialog.querySelector('.adventure-close').focus({ preventScroll: true });
   }
   function openTerminal() {
     const dialog = panel('terminal', '未来道具研究所 / 访客终端', '输入 help。D-mail 留给下次打开这里的自己，只存在这个浏览器里。');
     const body = dialog.querySelector('.adventure-panel-body');
-    if (labSaved) lab = readLab();
+    if (labSaved) lab = readLab(lab);
     body.innerHTML = '<figure class="adventure-lab-scene"><img src="/img/easter-eggs/lab-night.webp" alt="夜晚的未来道具研究所，红莉栖在旧电脑与辉光管前工作" width="1536" height="768" decoding="async"><figcaption><span>世界线观测值</span><output data-worldline></output></figcaption></figure><div class="adventure-terminal"><div class="adventure-terminal-bar"><span>LAB / visitor@future-gadget</span><span>接続中</span></div><div class="adventure-terminal-output" role="log" aria-live="polite" aria-label="终端消息" tabindex="0"></div><form class="adventure-terminal-form"><label for="adventure-command" aria-label="终端命令">lab <span aria-hidden="true">&gt;</span></label><input id="adventure-command" type="text" placeholder="help" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="120"><button type="submit">执行</button></form></div><div class="adventure-terminal-shortcuts"><button type="button" data-command="help">help</button><button type="button" data-command="ls">ls</button><button type="button" data-command="observe">观测世界线</button><button type="button" data-command="inbox">D-mail 信箱</button></div>';
     const output = body.querySelector('.adventure-terminal-output');
     const input = body.querySelector('#adventure-command');
@@ -559,12 +676,12 @@
     if (event.key === KEY || event.key === null) { found = read(); sync(); }
     if (event.key === SOS_KEY || event.key === null) {
       membershipSaved = true;
-      membership = readSOS();
+      membership = readSOS(membership);
       if (activeDialog?.dataset.panel === 'anime') renderMembership(activeDialog.querySelector('.adventure-panel-body'));
     }
     if (event.key === LAB_KEY || event.key === null) {
       labSaved = true;
-      lab = readLab();
+      lab = readLab(lab);
       const display = activeDialog?.querySelector('[data-worldline]');
       if (display) display.textContent = lab.worldline;
     }
