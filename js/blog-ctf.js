@@ -5,7 +5,7 @@
   if (!root || window.__blogCtfInstalled) return;
   window.__blogCtfInstalled = true;
   const KEY = 'blog-ctf-v1';
-  const SIGNAL = 'ZmxhZ3toZWxsb19mcm9tX3RoZV9vdGhlcl9zaWRlfQ==';
+  const SIGNAL = 'c3ludHt1cnl5Yl9zZWJ6X2d1cl9iZ3VyZV9mdnFyfQ==';
   const ids = ['signal', 'source', 'stack'];
   const flags = {
     signal: 'flag{hello_from_the_other_side}',
@@ -13,19 +13,19 @@
     stack: 'flag{one_small_step_into_win}'
   };
   const explanations = {
-    signal: '收信成功。Base64 只是编码，解码就能读到原文。',
-    source: '纸条找到了。HTML 注释留在源码里，页面不会把它显示出来。',
-    stack: '程序进入 win()！16 字节 buf + 8 字节 RBP，共 24 字节填充；后面的 8 字节覆盖 RIP。'
+    signal: '收信成功。先用 Base64 还原外层，再用 ROT13 还原字母，才是完整的 flag。',
+    source: '纸条拼好了。HTML 注释不会显示在页面上；按 01、02、03 的编号连接内容，就能得到完整 flag。',
+    stack: '模型进入 win()！24 字节填充后，接 8 字节 ret() 地址和 8 字节 win() 地址，共 40 字节。额外 ret 弹出 8 字节后，入口 RSP % 16 = 8。'
   };
   const hints = {
-    signal: ['此方：像攻略里的老招吧？末尾的等号可以当作线索。', '此方：选 Base64，再按解码。这里只是换一种写法，不用猜密码。', '此方：把解出来的 flag 原样抄进下面，花括号和大小写都算。'],
-    source: ['春日：桌面上没有？那就看看这间部室是怎么搭起来的。', '春日：打开页面源码。尖括号里面还有不会显示在页面上的字。', '春日：圈一下注释。<!-- 和 --> 中间就是那张纸条，把 flag 抄到下面。'],
-    stack: ['红莉栖：buf 后面还有 8 字节 RBP。返回地址从偏移 24 开始。', '红莉栖：填充调到 24，后面的 8 字节才会刚好落在 RIP 上。', '红莉栖：位置对齐以后，再选择 win() 的地址。小端序已经替你排好了。']
+    signal: ['此方：外面看着像 Base64。先把收到的信解开看看。', '此方：synt 和 flag 长得有点像。字母可能又转了一圈，试试 ROT13。', '此方：先选 Base64 解码，把得到的文字复制回工作台，再选 ROT13。两个工具接着用，不是二选一。'],
+    source: ['春日：页面上只有半句话？那就看看部室的源码。', '春日：注释里有三张纸条，都带着编号。先把它们圈出来。', '春日：按 01、02、03 排好，去掉编号和注释符号，把三段内容直接接起来。'],
+    stack: ['红莉栖：buf 16 字节，RBP 8 字节。返回地址从偏移 24 开始，先把位置摆对。', '红莉栖：选 win()。地址正确还不够，这个模型要求入口 RSP % 16 = 8；直接返回进去是 0。', '红莉栖：填充保持 24，在 win() 前接一个 ret()。它再弹出 8 字节，入口余数就从 0 变成 8。']
   };
   const reactions = {
-    signal: { win: '此方：读到了。攻略第一条，别把编码当加密。', wrong: '此方：先看看工作台的原文，再对一下答案。' },
-    source: { win: '春日：纸条找到了。这个新团员眼力还行！', wrong: '春日：注释里的那一行，原样抄过来就好。' },
-    stack: { win: '红莉栖：这次 RIP 对齐了。现在能进 win() 了。', wrong: '红莉栖：先看 RIP 的值，再决定改填充还是改地址。' }
+    signal: { win: '此方：两层都拆开了。下次记得先看看里面还有没有一层。', wrong: '此方：是不是还有一层没解？把工作台的结果再看一眼。' },
+    source: { win: '春日：三张拼起来了。这个团员眼力还行！', wrong: '春日：按编号排纸条，别把编号也抄进答案里。' },
+    stack: { win: '红莉栖：位置和对齐都对了。这次可以放你进 win()。', wrong: '红莉栖：先看 RIP 的值，再决定改填充还是改地址。' }
   };
   const hintSteps = { signal: 0, source: 0, stack: 0 };
   const $ = selector => root.querySelector(selector);
@@ -162,7 +162,9 @@
     try {
       decoded.textContent = decodeSignal(wire ? wire.value : SIGNAL, codec ? codec.value : 'base64');
       decoded.classList.remove('is-error');
-      say('signal', '此方：原文在这儿。你也可以换串 Hex 或 ROT13 玩玩。');
+      if (/^synt\{/.test(decoded.textContent)) say('signal', '此方：花括号还在，字母却偏了点。把这段再用 ROT13 解一次？');
+      else if (codec?.value === 'rot13' && /^flag\{/.test(decoded.textContent)) say('signal', '此方：这回读得通了。交答案的时候别漏括号。');
+      else say('signal', '此方：这一层读出来了。你也可以换串 Hex 或 ROT13 玩玩。');
     } catch (error) {
       decoded.textContent = error.message;
       decoded.classList.add('is-error');
@@ -210,17 +212,23 @@
     sourceCode.replaceChildren(fragment);
     sourceHighlight.disabled = true;
     sourceHighlight.textContent = '纸条已圈出';
-    say('source', '春日：就是这张纸条。把 flag 抄到下面，别连注释符号一起抄。');
+    say('source', '春日：这些纸条有编号。先排顺序，再把内容连起来。');
   });
 
   const padding = $('#ctf-padding');
+  const alignmentToggle = $('[data-stack-align]');
   const targets = {
     main: [0x80, 0x10, 0x40, 0, 0, 0, 0, 0],
     win: [0xd6, 0x11, 0x40, 0, 0, 0, 0, 0],
     lost: [0xef, 0xbe, 0xad, 0xde, 0, 0, 0, 0]
   };
+  const retAddress = [0x16, 0x10, 0x40, 0, 0, 0, 0, 0];
+  const equalBytes = (left, right) => left.every((byte, index) => byte === right[index]);
+  function addressHex(bytes) {
+    return '0x' + [...bytes].reverse().map(byte => byte.toString(16).padStart(2, '0')).join('').replace(/^0+(?=[0-9a-f])/, '');
+  }
   const cells = [];
-  ['buffer', 'rbp', 'rip'].forEach((region, regionIndex) => {
+  ['buffer', 'rbp', 'rip', 'chain'].forEach((region, regionIndex) => {
     const box = $('[data-stack-region="' + region + '"]');
     if (!box) return;
     for (let i = 0; i < (regionIndex === 0 ? 16 : 8); i++) {
@@ -230,6 +238,13 @@
       cells.push(cell);
     }
   });
+  function makePayload(state) {
+    const bytes = new Uint8Array(state.fill + (state.align ? 16 : 8));
+    bytes.fill(0x41, 0, state.fill);
+    if (state.align) bytes.set(retAddress, state.fill);
+    bytes.set(targets[state.choice], state.fill + (state.align ? 8 : 0));
+    return bytes;
+  }
   function model() {
     const raw = padding ? padding.value.trim() : '';
     const count = Number(raw);
@@ -237,15 +252,20 @@
     const fill = valid ? count : 0;
     const selected = $('input[name="ctf-target"]:checked')?.value || 'main';
     const choice = Object.hasOwn(targets, selected) ? selected : 'main';
-    const memory = Array(48).fill(0);
+    const align = !!alignmentToggle?.checked;
+    const memory = Array(56).fill(0);
     memory.splice(24, 8, ...targets.main);
-    if (valid) {
-      for (let i = 0; i < fill; i++) memory[i] = 0x41;
-      targets[choice].forEach((byte, i) => { memory[fill + i] = byte; });
-    }
+    const payload = valid ? makePayload({ fill, choice, align }) : new Uint8Array();
+    payload.forEach((byte, index) => { memory[index] = byte; });
     const rip = memory.slice(24, 32);
-    const hex = '0x' + [...rip].reverse().map(byte => byte.toString(16).padStart(2, '0')).join('').replace(/^0+(?=[0-9a-f])/, '');
-    return { valid, fill, choice, memory, rip, hex };
+    const next = memory.slice(32, 40);
+    const viaRet = equalBytes(rip, retAddress);
+    const entry = viaRet ? next : rip;
+    return {
+      valid, fill, choice, align, memory, payload, rip, next, viaRet, entry,
+      hex: addressHex(rip), nextHex: addressHex(next), entryHex: addressHex(entry),
+      entryModulo: viaRet ? 8 : 0
+    };
   }
   const download = $('[data-stack-download]');
   const route = $('[data-stack-route]');
@@ -265,13 +285,10 @@
   function updatePayload(state) {
     if (!download) return;
     if (!state.valid) { clearPayload(); return; }
-    const signature = state.fill + '/' + state.choice;
+    const signature = state.fill + '/' + state.choice + '/' + state.align;
     if (!payloadURL || payloadURL.signature !== signature) {
       clearPayload();
-      const bytes = new Uint8Array(state.fill + 8);
-      bytes.fill(0x41, 0, state.fill);
-      bytes.set(targets[state.choice], state.fill);
-      payloadURL = { url: URL.createObjectURL(new Blob([bytes], { type: 'application/octet-stream' })), signature, clicked: false };
+      payloadURL = { url: URL.createObjectURL(new Blob([state.payload], { type: 'application/octet-stream' })), signature, clicked: false };
     }
     download.href = payloadURL.url;
     download.download = 'payload.bin';
@@ -286,11 +303,21 @@
     cells.forEach((cell, index) => {
       cell.textContent = state.memory[index].toString(16).padStart(2, '0');
       cell.classList.toggle('is-padding', state.valid && index < state.fill);
-      cell.classList.toggle('is-address', state.valid && index >= state.fill && index < state.fill + 8);
+      cell.classList.toggle('is-address', state.valid && index >= state.fill && index < state.payload.length);
+      cell.classList.toggle('is-ret', state.valid && state.align && index >= state.fill && index < state.fill + 8);
       cell.title = '偏移 ' + index + ' · 0x' + cell.textContent;
     });
+    const chain = $('[data-stack-region="chain"]')?.closest('.ctf-stack-region');
+    if (chain) chain.hidden = !state.align;
+    $('.ctf-stack-visual')?.classList.toggle('has-chain', state.align);
     if ($('[data-rip]')) $('[data-rip]').textContent = state.valid ? state.hex : '等待有效输入';
-    if ($('[data-payload-size]')) $('[data-payload-size]').textContent = state.valid ? ' · payload 共 ' + (state.fill + 8) + ' 字节' : '';
+    if ($('[data-payload-size]')) $('[data-payload-size]').textContent = state.valid ? ' · payload 共 ' + state.payload.length + ' 字节' : '';
+    const alignment = $('[data-stack-alignment]');
+    if (alignment) {
+      if (!state.valid) alignment.textContent = '等待有效输入后，再看入口对齐。';
+      else if (state.viaRet) alignment.textContent = '额外 ret() 再弹出 8 字节 → 下一入口 RSP % 16 = 8；win() 需要 8。';
+      else alignment.textContent = '直接返回后的入口 RSP % 16 = 0；此模型的 win() 需要 8。';
+    }
     root.querySelectorAll('[data-stack-shift]').forEach(button => {
       const delta = Number(button.dataset.stackShift);
       button.disabled = state.valid && ((delta < 0 && state.fill === 0) || (delta > 0 && state.fill === 40));
@@ -299,6 +326,7 @@
     updatePayload(state);
   }
   padding?.addEventListener('input', () => renderStack(true));
+  alignmentToggle?.addEventListener('change', () => renderStack(true));
   root.querySelectorAll('input[name="ctf-target"]').forEach(radio => radio.addEventListener('change', () => renderStack(true)));
   root.querySelectorAll('[data-stack-shift]').forEach(button => {
     button.addEventListener('click', () => {
@@ -314,21 +342,30 @@
     const state = model();
     if (!state.valid) {
       feedback('stack', '先填一个 0 到 40 的整数，再运行。', false);
-      say('stack', '红莉栖：先用整数表示字节数。负数和小数放不进这个模型。');
+      say('stack', '红莉栖：字节数先用整数。负数和小数，先放一边。');
       if (route) { route.textContent = ''; route.hidden = true; }
       return;
     }
-    const wins = state.rip.every((byte, index) => byte === targets.win[index]);
-    const returns = state.rip.every((byte, index) => byte === targets.main[index]);
+    const entersWin = equalBytes(state.entry, targets.win);
+    const returnsMain = equalBytes(state.entry, targets.main);
+    const wins = entersWin && state.entryModulo === 8;
+    const destination = entersWin ? 'win() 入口，RSP % 16 = ' + state.entryModulo + (wins ? '，通过' : '，对齐检查失败') : returnsMain ? 'main()' : '跑飞';
     if (route) {
       route.hidden = false;
-      route.textContent = 'read(' + (state.fill + 8) + ' 字节) → ret → RIP = ' + state.hex + ' → ' + (wins ? 'win()' : returns ? 'main()' : '跑飞');
+      route.textContent = 'read(' + state.payload.length + ' 字节) → ret → RIP = ' + state.hex +
+        (state.viaRet ? ' → ret() 再弹出 8 字节 → 下一地址 = ' + state.nextHex : '') + ' → ' + destination;
     }
     if (wins) { earn('stack'); return; }
-    say('stack', reactions.stack.wrong);
-    if (state.fill < 24 && returns) feedback('stack', '程序回到了 main()。地址还没覆盖 RIP，buf 后面还有 8 字节 RBP。', false);
-    else if (state.fill === 24) feedback('stack', '位置对齐了。不过当前地址没有走进 win()，换一个目标再运行。', false);
-    else feedback('stack', 'RIP = ' + state.hex + '。让地址从偏移 24 开始，不能早也不能晚。', false);
+    if (entersWin) {
+      feedback('stack', 'win() 的地址到了，但入口 RSP % 16 = 0；此模型要求 8。多接一个 ret()，让它再弹出 8 字节。', false);
+      say('stack', '红莉栖：地址没填错。差一个 ret()，再试一次？');
+    } else if (returnsMain) {
+      feedback('stack', '程序回到了 main()。让地址从偏移 24 开始，并确认最后选的是 win()。', false);
+      say('stack', '红莉栖：还在 main()。先看看地址落在哪几格。');
+    } else {
+      feedback('stack', '程序跑飞：入口地址 = ' + state.entryHex + '。先把填充对齐到偏移 24，再检查 ret 链和目标地址。', false);
+      say('stack', '红莉栖：先对齐位置，再看后面的地址。别一口气改三处。');
+    }
   });
   $('.ctf-replay')?.addEventListener('click', () => {
     mergeRecord(readRecord());
@@ -345,6 +382,7 @@
     if (padding) padding.value = '16';
     const main = $('input[name="ctf-target"][value="main"]');
     if (main) main.checked = true;
+    if (alignmentToggle) alignmentToggle.checked = false;
     renderStack(true);
     sync();
     $('#ctf-signal-answer')?.focus({ preventScroll: true });

@@ -212,3 +212,21 @@
 #article-container .ctf-playground .ctf-radio.is-solved .ctf-radio-state { color: var(--ctf-success); }
 #article-container .ctf-playground .ctf-radio.is-solved > summary::after { content: ' ✓'; color: var(--ctf-success); }
 
+
+/* The return chain is visible only when the extra ret() is selected. */
+#article-container .ctf-playground .ctf-align-option { display: flex; align-items: flex-start; gap: 10px; min-width: 0; min-height: 44px; margin-top: 12px; padding: 10px 0; font-size: 13px; cursor: pointer; }
+#article-container .ctf-playground .ctf-align-option input[type='checkbox'] { flex: 0 0 auto; width: 18px; height: 18px; margin: 3px 0 0; accent-color: var(--ctf-accent); }
+#article-container .ctf-playground .ctf-align-option span { min-width: 0; overflow-wrap: anywhere; }
+#article-container .ctf-playground .ctf-align-option code { padding: 2px 4px; background: var(--ctf-soft); color: var(--ctf-accent); font: 12px/1.6 Consolas, 'SFMono-Regular', monospace; }
+#article-container .ctf-playground .ctf-align-note { margin: 0; color: var(--ctf-muted); font-size: 12px; }
+#article-container .ctf-playground .ctf-stack-visual.has-chain { grid-template-columns: 2fr 1fr 1fr 1fr; }
+#article-container .ctf-playground .ctf-stack-alignment { display: block; min-width: 0; margin: 0 0 14px; color: var(--ctf-muted); font-size: 12px; line-height: 1.8; overflow-wrap: anywhere; }
+#article-container .ctf-playground .ctf-stack-alignment.is-success { color: var(--ctf-success); }
+#article-container .ctf-playground .ctf-stack-alignment.is-error { color: var(--ctf-error); }
+@media (max-width: 700px) {
+  #article-container .ctf-playground .ctf-stack-visual.has-chain { grid-template-columns: 1fr; }
+}
+
+@media (min-width: 701px) and (max-width: 1000px) {
+  #article-container .ctf-playground .ctf-stack-visual.has-chain { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
