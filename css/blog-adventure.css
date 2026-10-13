@@ -280,3 +280,17 @@
 .adventure-panel-companion img { flex: 0 0 auto; width: 90px; height: 135px; object-fit: contain; }
 .adventure-room-guest { width: 120px; height: 180px; max-width: 27%; }
 @media (max-width: 500px) { .adventure-panel-companion { gap: 12px; } .adventure-panel-companion img { width: 74px; height: 111px; } .adventure-room-guest { width: 82px; height: 135px; max-width: 29%; } }
+
+/* A small gift from the person keeping this site. */
+.adventure-book-gifts { display: flex; flex-wrap: wrap; gap: 0 18px; }
+.adventure-cash-gift { display: grid; grid-template-columns: minmax(0,1fr) 90px; gap: 16px; margin: 0 0 20px; padding: 0 0 20px; border-bottom: 1px dashed var(--adv-line); }
+.adventure-cash-gift .adventure-cash-copy { min-width: 0; }
+.adventure-cash-gift h3 { font-size: 17px; }
+.adventure-cash-gift img { width: 90px; height: 150px; align-self: center; object-fit: contain; }
+.adventure-cash-gift label { display: flex; flex-wrap: wrap; align-items: center; gap: 0 10px; color: var(--adv-muted); font-size: 12px; }
+.adventure-cash-gift input { flex: 1; min-width: 90px; width: 100%; min-height: 44px; padding: 8px 0; border: 0; background: transparent; color: var(--adv-ink); font: 16px/1.6 Consolas,monospace; }
+.adventure-cash-actions { display: flex; flex-wrap: wrap; gap: 0 18px; }
+.adventure-cash-gift .adventure-cash-small { margin: 4px 0 0; color: var(--adv-muted); font-size: 11px; line-height: 1.8; }
+@media(max-width:500px) { .adventure-cash-gift { grid-template-columns: minmax(0,1fr) 64px; gap: 10px; } .adventure-cash-gift img { width: 64px; height: 105px; } .adventure-cash-gift h3 { font-size: 15px; } }
+
+.adventure-cash-gift .adventure-cash-limit { margin: 8px 0 12px; color: var(--adv-muted); font-size: 12px; line-height: 1.9; }
