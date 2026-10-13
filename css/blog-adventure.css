@@ -233,3 +233,43 @@
 .adventure-keepsake-signature input { width: 100%; min-width: 0; min-height: 44px; padding: 8px 9px; border: 1px solid var(--adv-line); border-radius: 2px; background: var(--adv-paper); color: var(--adv-ink); font-size: 16px; }
 .adventure-keepsake-signature input::placeholder { color: var(--adv-muted); font-size: 12px; }
 .adventure-keepsake-signature button { flex-shrink: 0; }
+
+/* A small personal notebook, with a few photographs stuck around its edge. */
+.adventure-dialog[data-panel='book'] { width: min(700px, calc(100vw - 28px)); --adv-paper: #fffaf4; --adv-line: #e6d9cd; --adv-accent: #986776; border-color: #d9cbbf; }
+.adventure-dialog[data-panel='book'] .adventure-panel-head h2 { font-family: 'KaiTi', 'STKaiti', 'Kaiti SC', serif; font-size: 25px; letter-spacing: 0; }
+.adventure-dialog[data-panel='book'] .adventure-book-intro { margin-bottom: 8px; gap: 20px; }
+.adventure-dialog[data-panel='book'] .adventure-book-memo p { max-width: 26em; margin-bottom: 14px; color: var(--adv-ink); font-size: 14px; line-height: 1.95; }
+.adventure-dialog[data-panel='book'] .adventure-book-visitor img { transform: rotate(-3deg); }
+.adventure-dialog[data-panel='book'] .adventure-book-progress strong { font: 17px/1.6 'KaiTi', 'STKaiti', serif; }
+.adventure-dialog[data-panel='book'] .adventure-stamps { display: grid; grid-template-columns: minmax(0, 1fr); gap: 0; }
+.adventure-dialog[data-panel='book'] .adventure-stamp { display: grid; grid-template-columns: 22px minmax(0, 1fr) auto; align-items: center; gap: 0 12px; padding: 12px 0; border-bottom-style: dashed; }
+.adventure-dialog[data-panel='book'] .adventure-stamp-icon { align-self: start; margin-top: 4px; color: #aa8292; }
+.adventure-dialog[data-panel='book'] .adventure-stamp-heading { flex-wrap: wrap; gap: 3px 12px; }
+.adventure-dialog[data-panel='book'] .adventure-stamp h3 { margin: 0; font-size: 14px; }
+.adventure-dialog[data-panel='book'] .adventure-stamp [data-entry-state] { margin-left: auto; font-size: 10px; }
+.adventure-dialog[data-panel='book'] .adventure-stamp p { margin-top: 5px; font-size: 12px; }
+.adventure-dialog[data-panel='book'] .adventure-stamp.is-found p { display: none; }
+.adventure-dialog[data-panel='book'] .adventure-stamp.is-found .adventure-stamp-icon { color: #668b72; }
+.adventure-dialog[data-panel='book'] .adventure-stamp-foot { margin: 0; min-width: 0; }
+.adventure-dialog[data-panel='book'] .adventure-entry-link { min-width: 44px; max-width: 170px; padding: 6px 0; font-size: 11px; }
+.adventure-dialog[data-panel='book'] .adventure-book-footer { gap: 0 20px; }
+.adventure-character-portrait { border: 2px solid var(--adv-paper); border-radius: 7px; box-shadow: 0 1px 3px #342a3018; }
+.adventure-character:nth-child(3n) .adventure-character-portrait { transform: rotate(3deg); }
+.adventure-character:nth-child(3n + 1) .adventure-character-portrait { transform: rotate(-3deg); }
+.adventure-character.is-selected .adventure-character-portrait { box-shadow: 0 0 0 1px #b58496; }
+.adventure-dialog[data-panel='keepsake'] .adventure-keepsake-picture { border: 0; margin-bottom: 0; }
+.adventure-dialog[data-panel='keepsake'] .adventure-keepsake-caption { margin: 7px 0 10px; font-size: 10px; }
+.adventure-keepsake-formats { margin-top: 3px; }
+.adventure-keepsake-formats button, .adventure-keepsake-choices button { color: var(--adv-accent); }
+.adventure-keepsake-signature { margin-top: 8px; }
+[data-theme='dark'] .adventure-dialog[data-panel='book'] { --adv-paper: #2d2929; --adv-line: #514747; --adv-accent: #dfafbd; border-color: #6c565e; }
+[data-theme='dark'] .adventure-dialog[data-panel='book'] .adventure-stamp-icon { color: #d2a3b6; }
+@media (max-width: 500px) {
+  .adventure-dialog[data-panel='book'] .adventure-panel-head h2 { font-size: 22px; }
+  .adventure-dialog[data-panel='book'] .adventure-book-intro { gap: 12px; }
+  .adventure-dialog[data-panel='book'] .adventure-book-memo p { font-size: 12px; line-height: 1.9; }
+  .adventure-dialog[data-panel='book'] .adventure-stamp { grid-template-columns: 18px minmax(0, 1fr); gap: 0 9px; padding: 12px 0 5px; }
+  .adventure-dialog[data-panel='book'] .adventure-stamp-foot { grid-column: 2; justify-content: flex-end; }
+  .adventure-dialog[data-panel='book'] .adventure-stamp [data-entry-state] { margin-left: 0; }
+  .adventure-dialog[data-panel='book'] .adventure-entry-link { max-width: 100%; }
+}

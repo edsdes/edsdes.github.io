@@ -1,0 +1,6 @@
+LAB / radio-05
+
+carrier: Base64
+body: IyAxNCI3JysYPi4tGiUjDCo3JiIrDSA/ICIt
+
+红莉栖：编码拆开后，还是没听清。部室里那本旧笔记应该还在。
