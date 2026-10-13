@@ -98,3 +98,21 @@
 @media (prefers-reduced-motion: reduce) {
   #article-container .arcade-room *, #article-container .arcade-room *::before, #article-container .arcade-room *::after { transition: none !important; animation: none !important; }
 }
+
+/* Individual portraits never fall back to the retired sprite tile. */
+#article-container .arcade-room .has-portraits :is(.arcade-card-portrait, .arcade-note-avatar).arcade-portrait-solo { background-image: none; background-size: cover; background-position: center; font-size: 24px; }
+#article-container .arcade-room .has-yui-portrait :is(.arcade-card-portrait, .arcade-note-avatar).arcade-portrait-solo { background-image: var(--portrait-image); background-size: cover; background-position: center; font-size: 0; }
+#article-container .arcade-room .arcade-memory-card:disabled:not(.is-matched) { cursor: default; }
+#article-container .arcade-room .arcade-flag-target[data-target-kind='tea'] { border-color: #ccb78d; background: #f7f0df; color: #8d733e; }
+#article-container .arcade-room .arcade-note-azusa { --portrait-x: 33.333333%; --portrait-y: 100%; }
+#article-container .arcade-room .arcade-music-board { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+#article-container .arcade-room .arcade-music-pad { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; min-width: 44px; min-height: 136px; padding: 12px 4px; border: 1px solid var(--arcade-line); border-bottom: 5px solid #cdd7c9; border-radius: 2px; background: var(--arcade-paper); color: var(--arcade-ink); font-size: 20px; transition: background .12s, border-color .12s; }
+#article-container .arcade-room .arcade-music-pad small { color: var(--arcade-muted); font-size: 11px; }
+#article-container .arcade-room .arcade-music-pad:disabled { cursor: default; opacity: 1; }
+#article-container .arcade-room .arcade-music-pad.is-playing { border-color: #709587; background: #d9e9dc; color: #365d43; }
+#article-container .arcade-room .arcade-music-board[data-phase='input'] .arcade-music-pad:hover { border-color: var(--arcade-accent); }
+[data-theme='dark'] #article-container .arcade-room .arcade-flag-target[data-target-kind='tea'] { border-color: #9b8558; background: #49402e; color: #e8d397; }
+[data-theme='dark'] #article-container .arcade-room .arcade-music-pad { border-bottom-color: #53644f; }
+[data-theme='dark'] #article-container .arcade-room .arcade-music-pad.is-playing { border-color: #98bc9b; background: #4d674c; color: #e7f4df; }
+@media (max-width: 500px) { #article-container .arcade-room .arcade-music-pad { min-height: 114px; font-size: 18px; } }
+@media (max-width: 360px) { #article-container .arcade-room .arcade-music-board { gap: 5px; } }

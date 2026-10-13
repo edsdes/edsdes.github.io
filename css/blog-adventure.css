@@ -210,3 +210,26 @@
   .adventure-room-object span { position: static; display: block; padding: 0; background: transparent; color: var(--adv-accent); font-size: 12px; transform: none; visibility: visible; }
   .adventure-room-object[aria-pressed="true"] span { text-decoration: underline; text-underline-offset: 5px; }
 }
+
+.adventure-konata { display: flex; align-items: flex-start; gap: 18px; }
+.adventure-note-copy { flex: 1; }
+.adventure-room-guest { flex: 0 0 auto; width: 100px; max-width: 23%; height: 150px; align-self: center; object-fit: contain; }
+@media (max-width: 500px) { .adventure-konata { gap: 10px; } .adventure-room-guest { width: 74px; max-width: 28%; height: 120px; } }
+
+
+/* Collected gifts: a photo, a quiet lock screen, or a slim character bookmark. */
+.adventure-keepsake-formats, .adventure-keepsake-choices { display: flex; flex-wrap: wrap; align-items: center; gap: 0 16px; }
+.adventure-keepsake-formats { margin: 0 0 5px; border-bottom: 1px solid var(--adv-line); }
+.adventure-keepsake-formats button, .adventure-keepsake-choices button { min-width: 44px; min-height: 44px; padding: 7px 2px; border: 0; background: transparent; color: var(--adv-muted); font: inherit; font-size: 12px; line-height: 1.8; }
+.adventure-keepsake-formats button { border-bottom: 2px solid transparent; }
+.adventure-keepsake-formats button[aria-pressed='true'] { border-bottom-color: var(--adv-accent); color: var(--adv-ink); }
+.adventure-keepsake-choices { margin: 0 0 12px; }
+.adventure-keepsake-choices button[aria-pressed='true'] { color: var(--adv-accent); text-decoration: underline; text-underline-offset: 4px; }
+.adventure-keepsake-formats button:hover, .adventure-keepsake-choices button:hover { color: var(--adv-ink); }
+.adventure-keepsake-picture[data-keepsake-preview='wallpaper'] { width: min(100%, 270px); aspect-ratio: 1080 / 1920; margin-inline: auto; }
+.adventure-keepsake-picture[data-keepsake-preview='bookmark'] { width: min(100%, 180px); aspect-ratio: 600 / 1600; margin-inline: auto; }
+.adventure-keepsake-signature { display: flex; flex-wrap: wrap; align-items: center; gap: 0 12px; margin: 0 0 16px; }
+.adventure-keepsake-signature label { display: flex; flex: 1 1 180px; align-items: center; gap: 9px; min-width: 0; color: var(--adv-muted); font-size: 12px; white-space: nowrap; }
+.adventure-keepsake-signature input { width: 100%; min-width: 0; min-height: 44px; padding: 8px 9px; border: 1px solid var(--adv-line); border-radius: 2px; background: var(--adv-paper); color: var(--adv-ink); font-size: 16px; }
+.adventure-keepsake-signature input::placeholder { color: var(--adv-muted); font-size: 12px; }
+.adventure-keepsake-signature button { flex-shrink: 0; }

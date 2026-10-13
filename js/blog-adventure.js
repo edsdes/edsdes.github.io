@@ -26,7 +26,7 @@
     { id: 'mikoto', name: '御坂美琴', work: '某科学的超电磁炮', x: '0%', y: '100%', notes: ['街机的最高分先放一边。你刚才那局还没结束。', '电脑又没反应了？别看我，这次真的没放电。'] },
     { id: 'azusa', name: '中野梓', work: '轻音少女', x: '33.333%', y: '100%', notes: ['茶可以再喝一杯，练习也别拖到明天。', '零食先放下。至少把这一小段做完吧。'] },
     { id: 'kuroneko', name: '黑猫', work: '我的妹妹哪有这么可爱！', x: '66.667%', y: '100%', notes: ['这份题解的标题太朴素了。内容倒是可以再看一遍。', '所谓隐藏记录……你总得先把隐藏文件列出来。'] },
-    { id: 'saber', name: 'Saber', work: 'Fate/stay night', x: '100%', y: '100%', notes: ['休息时间到了。吃完这份点心，再继续。', '准备充分再开始。饿着肚子很难赢下一局。'] }
+    { id: 'yui', name: '平泽唯', work: '轻音少女', x: '0%', y: '0%', portrait: '/img/easter-eggs/yui-room-portrait.webp', notes: ['先吃一块点心，再开始练习吧。梓说只能一块。', '吉他调好了！……刚才那个和弦，再教我一次好不好？'] }
   ];
   const ids = entries.map(entry => entry.id);
   function read() {
@@ -77,6 +77,7 @@
         node.querySelector('[data-entry-state]').textContent = earned ? '已找到' : '还没找到';
       });
       activeDialog.querySelector('.adventure-reward').hidden = found.size !== ids.length;
+      activeDialog.querySelector('[data-keepsake-quick]').hidden = found.size !== ids.length;
     }
     if (activeDialog?.dataset.panel === 'keepsake' && found.size !== ids.length) closePanel();
     window.dispatchEvent(new CustomEvent('blog:adventure', { detail: { found: ids.filter(id => found.has(id)), count: found.size } }));
@@ -139,11 +140,12 @@
     return dialog;
   }
   function openBook() {
-    const dialog = panel('book', '彩蛋簿', '找齐八个，有封信和一张纪念卡。');
+    const dialog = panel('book', '彩蛋簿', '找齐八个，可以收下合照、壁纸和书签。');
     const body = dialog.querySelector('.adventure-panel-body');
-    body.innerHTML = '<div class="adventure-book-intro"><div class="adventure-book-memo"><p>没找到的，可以从这里过去。</p><div class="adventure-book-progress"><span>已找到 <strong data-book-count></strong></span><progress class="adventure-sr-only" max="8" value="0" aria-label="彩蛋收集进度"></progress></div></div><button type="button" class="adventure-book-visitor" data-open-anime><img src="/img/easter-eggs/konata-room-cutout.webp" alt="此方拿着掌机和饼干坐在部室里" width="667" height="1000" decoding="async"><span>去部室坐坐 →</span></button></div><div class="adventure-stamps" aria-label="八枚彩蛋记录"></div><nav class="adventure-book-footer" aria-label="部室入口"><span>歇一会儿：</span><button type="button" class="adventure-secondary" data-open-anime>SOS 团部室</button><button type="button" class="adventure-secondary" data-open-wish>抽张纸条</button></nav><section class="adventure-reward" hidden><h3>留在最后的一封信</h3><details><summary>拆开这封信</summary><p class="adventure-letter-message"></p><p class="adventure-letter-sign">—— 无敌马的小窝</p></details><div class="adventure-reward-actions"><button type="button" class="adventure-secondary" data-open-keepsake>收下纪念卡 ↗</button><button type="button" class="adventure-secondary" data-reward-wish>看看金色便签</button></div><p class="adventure-letter-note">还有一张部室合照和限定金色便签，可以一起收下。</p></section><p class="adventure-local-note">记录存在当前浏览器里。</p>';
+    body.innerHTML = '<div class="adventure-book-intro"><div class="adventure-book-memo"><p>没找到的，可以从这里过去。</p><div class="adventure-book-progress"><span>已找到 <strong data-book-count></strong></span><progress class="adventure-sr-only" max="8" value="0" aria-label="彩蛋收集进度"></progress></div><button type="button" class="adventure-secondary" data-keepsake-quick hidden>礼物在这儿 →</button></div><button type="button" class="adventure-book-visitor" data-open-anime><img src="/img/easter-eggs/konata-room-cutout.webp" alt="此方拿着掌机和饼干坐在部室里" width="667" height="1000" decoding="async"><span>去部室坐坐 →</span></button></div><div class="adventure-stamps" aria-label="八枚彩蛋记录"></div><nav class="adventure-book-footer" aria-label="部室入口"><span>歇一会儿：</span><button type="button" class="adventure-secondary" data-open-anime>SOS 团部室</button><button type="button" class="adventure-secondary" data-open-wish>抽张纸条</button></nav><section class="adventure-reward" hidden><h3>留在最后的一封信</h3><details><summary>拆开这封信</summary><p class="adventure-letter-message"></p><p class="adventure-letter-sign">—— 无敌马的小窝</p></details><div class="adventure-reward-actions"><button type="button" class="adventure-secondary" data-open-keepsake>挑一份留念 ↗</button><button type="button" class="adventure-secondary" data-reward-wish>看看金色便签</button></div><p class="adventure-letter-note">合照、角色壁纸和书签都可以保存，也给你留了张金色便签。</p></section><p class="adventure-local-note">记录存在当前浏览器里。</p>';
     body.querySelector('.adventure-letter-message').textContent = greeting;
     body.querySelector('[data-open-keepsake]').addEventListener('click', openKeepsake);
+    body.querySelector('[data-keepsake-quick]').addEventListener('click', openKeepsake);
     body.querySelector('[data-reward-wish]').addEventListener('click', () => {
       if (found.size !== ids.length) return;
       openWish();
@@ -195,137 +197,288 @@
   }
   function openKeepsake() {
     if (found.size !== ids.length) {
-      notice('八个彩蛋找齐后，纪念卡就会出现在彩蛋簿里。');
+      notice('八个彩蛋找齐后，留给你的礼物就会出现在彩蛋簿里。');
       return;
     }
-    const dialog = panel('keepsake', '全收集留念', '春日、此方和红莉栖的部室合照，收下吧。');
+    const dialog = panel('keepsake', '留给你的礼物', '合照可以留着，也可以挑一张壁纸或书签。');
     const body = dialog.querySelector('.adventure-panel-body');
-    body.innerHTML = '<figure class="adventure-keepsake-picture" aria-busy="true"><img data-keepsake-image hidden alt="春日、此方和红莉栖的全收集纪念卡" width="1600" height="1160"><p data-keepsake-loading>合照准备中…</p></figure><p class="adventure-keepsake-caption">放学后的部室 / 集齐留念</p><p class="adventure-keepsake-text"></p><div class="adventure-keepsake-actions"><a data-keepsake-save hidden download>保存纪念卡</a><button type="button" class="adventure-secondary" data-keepsake-retry hidden>再试一次</button><button type="button" class="adventure-secondary" data-back-book>回彩蛋簿</button></div><p class="adventure-keepsake-tip">手机上也可以长按图片保存。</p>';
+    body.innerHTML = '<nav class="adventure-keepsake-formats" aria-label="礼物样式"><button type="button" data-keepsake-format="card" aria-pressed="true">合照卡</button><button type="button" data-keepsake-format="wallpaper" aria-pressed="false">手机壁纸</button><button type="button" data-keepsake-format="bookmark" aria-pressed="false">角色书签</button></nav><div class="adventure-keepsake-choices" data-keepsake-covers role="group" aria-label="合照"><button type="button" data-keepsake-cover="club" aria-pressed="true">放学后的部室</button><button type="button" data-keepsake-cover="tea" aria-pressed="false">下午茶</button></div><div class="adventure-keepsake-choices" data-keepsake-characters role="group" aria-label="选择角色" hidden><button type="button" data-keepsake-character="konata" aria-pressed="true">此方</button><button type="button" data-keepsake-character="yui" aria-pressed="false">平泽唯</button><button type="button" data-keepsake-character="chino" aria-pressed="false">香风智乃</button></div><figure class="adventure-keepsake-picture" data-keepsake-preview="card" aria-busy="true"><img data-keepsake-image hidden alt="春日、此方和红莉栖的全收集纪念卡" width="1600" height="1160"><p data-keepsake-loading role="status" aria-live="polite">合照准备中…</p></figure><p class="adventure-keepsake-caption" data-keepsake-caption>1600 × 1160 / 合照卡</p><form class="adventure-keepsake-signature"><label for="adventure-keepsake-name">留给<input id="adventure-keepsake-name" data-keepsake-name maxlength="20" autocomplete="nickname" placeholder="来小站做客的你"></label><button type="submit" class="adventure-secondary" data-keepsake-update data-keepsake-personalize>更新署名</button></form><p class="adventure-keepsake-text"></p><div class="adventure-keepsake-actions"><a data-keepsake-save hidden download>保存纪念卡</a><button type="button" class="adventure-secondary" data-keepsake-retry hidden>再试一次</button><button type="button" class="adventure-secondary" data-back-book>回彩蛋簿</button></div><p class="adventure-keepsake-tip">手机上也可以长按图片保存。</p>';
     body.querySelector('.adventure-keepsake-text').textContent = greeting;
     const image = body.querySelector('[data-keepsake-image]');
     const frame = body.querySelector('.adventure-keepsake-picture');
     const loading = body.querySelector('[data-keepsake-loading]');
     const save = body.querySelector('[data-keepsake-save]');
     const retry = body.querySelector('[data-keepsake-retry]');
+    const caption = body.querySelector('[data-keepsake-caption]');
+    const input = body.querySelector('[data-keepsake-name]');
     const status = dialog.querySelector('.adventure-panel-status');
-    const controller = new AbortController();
     const savedMembership = membershipSaved ? readSOS(membership) : membership;
-    const recipient = savedMembership?.name || '来小站做客的你';
+    let recipient = savedMembership?.name || '来小站做客的你';
+    input.value = savedMembership?.name || '';
     const now = new Date();
     const date = [now.getFullYear(), String(now.getMonth() + 1).padStart(2, '0'), String(now.getDate()).padStart(2, '0')].join('.');
-    let blobURL = '', saveStarted = false;
-    function loadPicture() {
+    const formats = {
+      card: { width: 1600, height: 1160, name: '合照卡', save: '保存纪念卡' },
+      wallpaper: { width: 1080, height: 1920, name: '手机壁纸', save: '保存壁纸' },
+      bookmark: { width: 600, height: 1600, name: '角色书签', save: '保存书签' }
+    };
+    const portraits = {
+      konata: { name: '此方', src: '/img/easter-eggs/konata-room-cutout.webp', paper: '#f5f1fc', ink: '#685481' },
+      yui: { name: '平泽唯', src: '/img/easter-eggs/yui-room-cutout.webp', paper: '#fff7eb', ink: '#966747' },
+      chino: { name: '香风智乃', src: '/img/easter-eggs/chino-room-cutout.webp', paper: '#edf6fa', ink: '#527b90' }
+    };
+    const covers = {
+      club: { name: '放学后的部室', src: '/img/easter-eggs/all-collected-clubroom.webp', alt: '春日、此方和红莉栖的全收集纪念卡' },
+      tea: { name: '下午茶', src: '/img/easter-eggs/classic-club-afternoon.webp', alt: '长门、美琴、梓和黑猫的下午茶纪念卡' }
+    };
+    const sans = '"Microsoft YaHei", "Yu Gothic", Arial, sans-serif';
+    let format = 'card', character = 'konata', cover = 'club', revision = 0, closed = false, renderController = null, currentBlob = null;
+    const pictures = new Map();
+    function retire(record) {
+      if (!record || record.retired) return;
+      record.retired = true;
+      // A browser download may still be reading this URL after the preview changes.
+      if (record.downloaded) setTimeout(() => URL.revokeObjectURL(record.url), 30000);
+      else URL.revokeObjectURL(record.url);
+    }
+    function loadPicture(src, signal) {
+      if (pictures.has(src)) return Promise.resolve(pictures.get(src));
       return new Promise((resolve, reject) => {
-        if (controller.signal.aborted) { reject(new Error('closed')); return; }
+        if (signal.aborted) { reject(new Error('cancelled')); return; }
         const picture = new Image();
         picture.decoding = 'async';
+        let settled = false;
         const timer = setTimeout(() => fail(new Error('image timeout')), 12000);
         function cleanup() {
           clearTimeout(timer);
           picture.onload = picture.onerror = null;
-          controller.signal.removeEventListener('abort', abort);
+          signal.removeEventListener('abort', abort);
         }
-        function fail(error) { cleanup(); picture.src = ''; reject(error); }
-        function abort() { fail(new Error('closed')); }
-        picture.onload = () => {
-          if (!picture.naturalWidth || !picture.naturalHeight) { fail(new Error('empty image')); return; }
+        function fail(error) {
+          if (settled) return;
+          settled = true;
           cleanup();
+          picture.src = '';
+          reject(error);
+        }
+        function abort() { fail(new Error('cancelled')); }
+        picture.onload = () => {
+          if (settled) return;
+          if (!picture.naturalWidth || !picture.naturalHeight) { fail(new Error('empty image')); return; }
+          settled = true;
+          cleanup();
+          pictures.set(src, picture);
           resolve(picture);
         };
         picture.onerror = () => fail(new Error('image failed'));
-        controller.signal.addEventListener('abort', abort, { once: true });
-        picture.src = '/img/easter-eggs/all-collected-clubroom.webp';
+        signal.addEventListener('abort', abort, { once: true });
+        picture.src = src;
       });
     }
+    function fitPortrait(ctx, picture, box) {
+      const scale = Math.min(box.width / picture.naturalWidth, box.height / picture.naturalHeight);
+      const width = picture.naturalWidth * scale, height = picture.naturalHeight * scale;
+      ctx.drawImage(picture, box.x + (box.width - width) / 2, box.y + box.height - height, width, height);
+    }
+    function drawCard(ctx, picture, selection) {
+      ctx.fillStyle = '#faf7ef';
+      ctx.fillRect(0, 0, 1600, 1160);
+      const photo = { x: 60, y: 60, width: 1480, height: 832.5 };
+      const scale = Math.max(photo.width / picture.naturalWidth, photo.height / picture.naturalHeight);
+      const cropWidth = photo.width / scale, cropHeight = photo.height / scale;
+      ctx.drawImage(picture, (picture.naturalWidth - cropWidth) / 2, (picture.naturalHeight - cropHeight) / 2, cropWidth, cropHeight, photo.x, photo.y, photo.width, photo.height);
+      ctx.fillStyle = '#4b4e46';
+      ctx.font = '38px "Noto Serif CJK SC", "Songti SC", SimSun, serif';
+      ctx.fillText(covers[selection.cover].name, 70, 954);
+      ctx.textAlign = 'right';
+      ctx.font = '24px ' + sans;
+      ctx.fillStyle = '#858476';
+      ctx.fillText('8 / 8', 1530, 951);
+      ctx.textAlign = 'left';
+      ctx.strokeStyle = '#ddd7ca';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(70, 976);
+      ctx.lineTo(1530, 976);
+      ctx.stroke();
+      const cialloAt = greeting.indexOf('Ciallo');
+      ctx.fillStyle = '#56594f';
+      ctx.font = '25px ' + sans;
+      ctx.fillText(greeting.slice(0, cialloAt), 70, 1023, 1460);
+      ctx.font = '34px ' + sans;
+      ctx.fillText(greeting.slice(cialloAt), 70, 1070);
+      ctx.fillStyle = '#858476';
+      ctx.font = '20px ' + sans;
+      ctx.fillText('留给 ' + selection.recipient, 70, 1120, 800);
+      ctx.textAlign = 'right';
+      ctx.fillText('无敌马的小窝 · 留念于 ' + date, 1530, 1120);
+    }
+    function drawWallpaper(ctx, picture, selection) {
+      const portrait = portraits[selection.character];
+      ctx.fillStyle = portrait.paper;
+      ctx.fillRect(0, 0, 1080, 1920);
+      // Keep the upper quarter quiet for the phone's clock and notifications.
+      fitPortrait(ctx, picture, { x: 75, y: 480, width: 930, height: 1240 });
+      ctx.fillStyle = portrait.ink;
+      ctx.textAlign = 'center';
+      ctx.font = '30px ' + sans;
+      ctx.fillText('Ciallo～(∠・ω< )⌒★', 540, 1782);
+      ctx.font = '22px ' + sans;
+      ctx.fillText('留给 ' + selection.recipient, 540, 1830, 930);
+      ctx.fillStyle = '#7e8584';
+      ctx.font = '18px ' + sans;
+      ctx.fillText('无敌马的小窝 · 8 / 8 · ' + date, 540, 1872, 930);
+    }
+    function drawBookmark(ctx, picture, selection) {
+      const portrait = portraits[selection.character];
+      ctx.fillStyle = portrait.paper;
+      ctx.fillRect(0, 0, 600, 1600);
+      ctx.fillStyle = portrait.ink;
+      ctx.textAlign = 'center';
+      ctx.font = '32px "Noto Serif CJK SC", "Songti SC", SimSun, serif';
+      ctx.fillText('无敌马的小窝', 300, 96);
+      ctx.font = '18px ' + sans;
+      ctx.fillText('8 / 8', 300, 137);
+      ctx.strokeStyle = '#cfd5ce';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(80, 172);
+      ctx.lineTo(520, 172);
+      ctx.stroke();
+      fitPortrait(ctx, picture, { x: 45, y: 210, width: 510, height: 1140 });
+      ctx.fillStyle = portrait.ink;
+      ctx.font = '27px ' + sans;
+      ctx.fillText('Ciallo～(∠・ω< )⌒★', 300, 1420, 510);
+      ctx.font = '20px ' + sans;
+      ctx.fillText('留给 ' + selection.recipient, 300, 1470, 510);
+      ctx.fillStyle = '#7e8584';
+      ctx.font = '17px ' + sans;
+      ctx.fillText('留念于 ' + date, 300, 1520);
+    }
+    function updateChoices() {
+      body.querySelectorAll('[data-keepsake-format]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.keepsakeFormat === format)));
+      body.querySelectorAll('[data-keepsake-character]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.keepsakeCharacter === character)));
+      body.querySelectorAll('[data-keepsake-cover]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.keepsakeCover === cover)));
+      body.querySelector('[data-keepsake-covers]').hidden = format !== 'card';
+      body.querySelector('[data-keepsake-characters]').hidden = format === 'card';
+      frame.dataset.keepsakePreview = format;
+      const details = formats[format];
+      image.width = details.width;
+      image.height = details.height;
+      image.alt = format === 'card' ? covers[cover].alt : portraits[character].name + '的全收集' + details.name;
+      caption.textContent = details.width + ' × ' + details.height + ' / ' + (format === 'card' ? covers[cover].name : portraits[character].name);
+      save.textContent = details.save;
+    }
     async function prepare() {
-      retry.disabled = true;
-      retry.hidden = true;
+      const renderId = ++revision;
+      renderController?.abort();
+      const controller = new AbortController();
+      renderController = controller;
+      const selection = { format, character, cover, recipient };
+      const details = formats[selection.format];
+      let candidate = null;
+      function current() {
+        return !closed && !controller.signal.aborted && renderId === revision && dialog.open && found.size === ids.length;
+      }
+      retire(currentBlob);
+      currentBlob = null;
       save.hidden = true;
+      save.removeAttribute('href');
       image.hidden = true;
+      image.removeAttribute('src');
+      retry.hidden = true;
+      retry.disabled = true;
       loading.hidden = false;
-      loading.textContent = '合照准备中…';
+      loading.textContent = details.name + '准备中…';
       frame.setAttribute('aria-busy', 'true');
       status.textContent = '';
+      updateChoices();
       try {
-        const picture = await loadPicture();
-        if (controller.signal.aborted || found.size !== ids.length) return;
+        const source = selection.format === 'card' ? covers[selection.cover].src : portraits[selection.character].src;
+        const picture = await loadPicture(source, controller.signal);
+        if (!current()) return;
         const canvas = document.createElement('canvas');
-        canvas.width = 1600;
-        canvas.height = 1160;
+        canvas.width = details.width;
+        canvas.height = details.height;
         const ctx = canvas.getContext('2d');
         if (!ctx) throw new Error('canvas unavailable');
-        ctx.fillStyle = '#faf7ef';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        const photo = { x: 60, y: 60, width: 1480, height: 832.5 };
-        const scale = Math.max(photo.width / picture.naturalWidth, photo.height / picture.naturalHeight);
-        const cropWidth = photo.width / scale, cropHeight = photo.height / scale;
-        ctx.drawImage(picture, (picture.naturalWidth - cropWidth) / 2, (picture.naturalHeight - cropHeight) / 2, cropWidth, cropHeight, photo.x, photo.y, photo.width, photo.height);
-        const sans = '"Microsoft YaHei", "Yu Gothic", Arial, sans-serif';
-        ctx.fillStyle = '#4b4e46';
-        ctx.font = '38px "Noto Serif CJK SC", "Songti SC", SimSun, serif';
-        ctx.fillText('放学后的部室', 70, 954);
-        ctx.textAlign = 'right';
-        ctx.font = '24px ' + sans;
-        ctx.fillStyle = '#858476';
-        ctx.fillText('8 / 8', 1530, 951);
-        ctx.textAlign = 'left';
-        ctx.strokeStyle = '#ddd7ca';
-        ctx.lineWidth = 1;
-        ctx.beginPath();
-        ctx.moveTo(70, 976);
-        ctx.lineTo(1530, 976);
-        ctx.stroke();
-        const cialloAt = greeting.indexOf('Ciallo');
-        ctx.fillStyle = '#56594f';
-        ctx.font = '25px ' + sans;
-        ctx.fillText(greeting.slice(0, cialloAt), 70, 1023, 1460);
-        ctx.font = '34px ' + sans;
-        ctx.fillText(greeting.slice(cialloAt), 70, 1070);
-        ctx.fillStyle = '#858476';
-        ctx.font = '20px ' + sans;
-        ctx.fillText('留给 ' + recipient, 70, 1120, 800);
-        ctx.textAlign = 'right';
-        ctx.fillText('无敌马的小窝 · 留念于 ' + date, 1530, 1120);
+        if (selection.format === 'card') drawCard(ctx, picture, selection);
+        else if (selection.format === 'wallpaper') drawWallpaper(ctx, picture, selection);
+        else drawBookmark(ctx, picture, selection);
         const blob = await new Promise((resolve, reject) => canvas.toBlob(result => result ? resolve(result) : reject(new Error('PNG failed')), 'image/png'));
-        if (controller.signal.aborted || !dialog.open || found.size !== ids.length) return;
-        blobURL = URL.createObjectURL(blob);
-        image.src = blobURL;
-        await image.decode();
-        if (controller.signal.aborted || !dialog.open || found.size !== ids.length) return;
+        if (!current()) return;
+        candidate = { url: URL.createObjectURL(blob), downloaded: false, retired: false };
+        // Decode separately so an obsolete render cannot change the visible preview.
+        const decoded = new Image();
+        decoded.src = candidate.url;
+        await decoded.decode();
+        if (!current()) { retire(candidate); return; }
+        currentBlob = candidate;
+        image.src = candidate.url;
         image.hidden = false;
         loading.hidden = true;
-        save.href = blobURL;
-        save.download = '小站留念-' + date.replaceAll('.', '') + '.png';
+        save.href = candidate.url;
+        save.download = '小站留念-' + details.name + (selection.format === 'card' ? '' : '-' + portraits[selection.character].name) + '-' + date.replaceAll('.', '') + '.png';
         save.hidden = false;
       } catch (_) {
-        if (controller.signal.aborted || !dialog.open) return;
-        if (blobURL) { URL.revokeObjectURL(blobURL); blobURL = ''; }
-        loading.textContent = '这次没能准备好纪念卡。';
-        status.textContent = '点「再试一次」重试，信和金色便签仍在彩蛋簿里。';
+        retire(candidate);
+        if (!current()) return;
+        currentBlob = null;
+        loading.textContent = '这次没能准备好' + details.name + '。';
+        status.textContent = '可以再试一次，也可以换一张。';
         retry.hidden = false;
       } finally {
-        frame.setAttribute('aria-busy', 'false');
-        retry.disabled = false;
+        if (renderId === revision && !closed) {
+          frame.setAttribute('aria-busy', 'false');
+          retry.disabled = false;
+        }
       }
     }
-    retry.addEventListener('click', prepare);
+    body.querySelectorAll('[data-keepsake-format]').forEach(button => button.addEventListener('click', () => {
+      if (format === button.dataset.keepsakeFormat) return;
+      format = button.dataset.keepsakeFormat;
+      void prepare();
+    }));
+    body.querySelectorAll('[data-keepsake-character]').forEach(button => button.addEventListener('click', () => {
+      if (character === button.dataset.keepsakeCharacter) return;
+      character = button.dataset.keepsakeCharacter;
+      void prepare();
+    }));
+    body.querySelectorAll('[data-keepsake-cover]').forEach(button => button.addEventListener('click', () => {
+      if (cover === button.dataset.keepsakeCover) return;
+      cover = button.dataset.keepsakeCover;
+      void prepare();
+    }));
+    body.querySelector('.adventure-keepsake-signature').addEventListener('submit', event => {
+      event.preventDefault();
+      if (!input.reportValidity()) return;
+      const next = input.value.trim().slice(0, 20) || '来小站做客的你';
+      input.value = input.value.trim().slice(0, 20);
+      if (next === recipient) {
+        status.textContent = '署名已经在图片上了。';
+        return;
+      }
+      recipient = next;
+      void prepare();
+    });
+    retry.addEventListener('click', () => { void prepare(); });
     save.addEventListener('click', event => {
-      if (found.size !== ids.length || !blobURL) { event.preventDefault(); return; }
-      saveStarted = true;
+      if (closed || found.size !== ids.length || !currentBlob || save.hidden) { event.preventDefault(); return; }
+      currentBlob.downloaded = true;
     });
     body.querySelector('[data-back-book]').addEventListener('click', openBook);
     dialog.addEventListener('close', () => {
-      controller.abort();
-      if (blobURL) {
-        const url = blobURL;
-        // Give an initiated browser download time to read its Blob before releasing it.
-        if (saveStarted) setTimeout(() => URL.revokeObjectURL(url), 30000);
-        else URL.revokeObjectURL(url);
-      }
+      closed = true;
+      ++revision;
+      renderController?.abort();
+      retire(currentBlob);
+      currentBlob = null;
+      pictures.clear();
     }, { once: true });
     void prepare();
     dialog.querySelector('.adventure-close').focus({ preventScroll: true });
   }
+
   function renderMembership(body) {
     const saved = membership;
     body.querySelector('.adventure-sos-form').hidden = !!saved;
@@ -340,7 +493,7 @@
     const dialog = panel('anime', 'SOS 团 · 临时部室', '今天也没正经开会。');
     const body = dialog.querySelector('.adventure-panel-body');
     if (membershipSaved) membership = readSOS(membership);
-    body.innerHTML = "<figure class=\"adventure-sos-photo\"><div class=\"adventure-room-photo\"><img src=\"/img/easter-eggs/classic-club-afternoon.webp\" alt=\"长门在左边读书，美琴、梓和黑猫围桌喝茶；桌上有电脑和点心，后面靠着吉他\" width=\"1536\" height=\"864\" decoding=\"async\"><div class=\"adventure-room-objects\" role=\"group\" aria-label=\"部室里的小物件\"></div></div><figcaption>桌上的东西可以点。点心记得分着吃。</figcaption></figure><section class=\"adventure-club-notes\" aria-labelledby=\"adventure-club-notes-title\"><h3 id=\"adventure-club-notes-title\" class=\"adventure-sr-only\">部室闲聊</h3><div class=\"adventure-character-list\" role=\"group\" aria-label=\"和谁聊两句\"></div><div class=\"adventure-konata\"><span class=\"adventure-note-portrait adventure-character-portrait\" aria-hidden=\"true\"></span><div class=\"adventure-note-copy\"><div class=\"adventure-konata-speaker\"><strong data-character-speaker></strong><small data-character-work></small></div><p class=\"adventure-konata-line\" aria-live=\"polite\"></p><div class=\"adventure-room-response\"><button type=\"button\" class=\"adventure-secondary\" data-room-action hidden></button><span data-room-detail></span><button type=\"button\" class=\"adventure-anime-next\">聊点别的</button></div></div></div></section><nav class=\"adventure-room-links\" aria-label=\"从部室出发\"><button type=\"button\" class=\"adventure-secondary\" data-back-book>翻开彩蛋簿</button><a href=\"/play/arcade/\">去摸鱼角 →</a></nav><details class=\"adventure-registration\"><summary>入团登记 / 团员证</summary><form class=\"adventure-sos-form\"><h3>入团登记</h3><p class=\"adventure-sos-note\">宇宙人、未来人、异世界人，以及今晚还没写 WP 的人。</p><div class=\"adventure-sos-fields\"><label for=\"adventure-sos-name\">怎么称呼你<input id=\"adventure-sos-name\" name=\"name\" maxlength=\"20\" required placeholder=\"路过的阿宅\" autocomplete=\"nickname\"></label><label for=\"adventure-sos-role\">部室分工<select id=\"adventure-sos-role\" name=\"role\"><option value=\"debug\">找 bug 的</option><option value=\"writeup\">写 WP 的</option><option value=\"game\">负责摸鱼的</option><option value=\"observe\">观测世界线的</option></select></label></div><button type=\"submit\" class=\"adventure-secondary adventure-sos-submit\" data-sos-join>交给团长</button><span class=\"adventure-sos-local\">登记只保存在你的浏览器里。</span></form><section class=\"adventure-sos-receipt\" hidden aria-live=\"polite\"><div class=\"adventure-sos-receipt-head\"><h3>临时团员证</h3><span data-sos-number></span></div><p><strong data-sos-name></strong><span> / </span><span data-sos-role></span></p><p class=\"adventure-sos-approval\">批准。下次开会记得带点零食。</p><div class=\"adventure-sos-receipt-foot\"><time data-sos-date></time><button type=\"button\" class=\"adventure-sos-edit\">重新填表</button></div></section></details>";
+    body.innerHTML = "<figure class=\"adventure-sos-photo\"><div class=\"adventure-room-photo\"><img src=\"/img/easter-eggs/classic-club-afternoon.webp\" alt=\"长门在左边读书，美琴、梓和黑猫围桌喝茶；桌上有电脑和点心，后面靠着吉他\" width=\"1536\" height=\"864\" decoding=\"async\"><div class=\"adventure-room-objects\" role=\"group\" aria-label=\"部室里的小物件\"></div></div><figcaption>桌上的东西可以点。点心记得分着吃。</figcaption></figure><section class=\"adventure-club-notes\" aria-labelledby=\"adventure-club-notes-title\"><h3 id=\"adventure-club-notes-title\" class=\"adventure-sr-only\">部室闲聊</h3><div class=\"adventure-character-list\" role=\"group\" aria-label=\"和谁聊两句\"></div><div class=\"adventure-konata\"><span class=\"adventure-note-portrait adventure-character-portrait\" aria-hidden=\"true\"></span><div class=\"adventure-note-copy\"><div class=\"adventure-konata-speaker\"><strong data-character-speaker></strong><small data-character-work></small></div><p class=\"adventure-konata-line\" aria-live=\"polite\"></p><div class=\"adventure-room-response\"><button type=\"button\" class=\"adventure-secondary\" data-room-action hidden></button><span data-room-detail></span><button type=\"button\" class=\"adventure-anime-next\">聊点别的</button></div></div><img class=\"adventure-room-guest\" data-room-guest src=\"/img/easter-eggs/konata-room-cutout.webp\" alt=\"此方在部室玩掌机\" width=\"667\" height=\"1000\" decoding=\"async\"></div></section><nav class=\"adventure-room-links\" aria-label=\"从部室出发\"><button type=\"button\" class=\"adventure-secondary\" data-back-book>翻开彩蛋簿</button><a href=\"/play/arcade/\">去摸鱼角 →</a></nav><details class=\"adventure-registration\"><summary>入团登记 / 团员证</summary><form class=\"adventure-sos-form\"><h3>入团登记</h3><p class=\"adventure-sos-note\">宇宙人、未来人、异世界人，以及今晚还没写 WP 的人。</p><div class=\"adventure-sos-fields\"><label for=\"adventure-sos-name\">怎么称呼你<input id=\"adventure-sos-name\" name=\"name\" maxlength=\"20\" required placeholder=\"路过的阿宅\" autocomplete=\"nickname\"></label><label for=\"adventure-sos-role\">部室分工<select id=\"adventure-sos-role\" name=\"role\"><option value=\"debug\">找 bug 的</option><option value=\"writeup\">写 WP 的</option><option value=\"game\">负责摸鱼的</option><option value=\"observe\">观测世界线的</option></select></label></div><button type=\"submit\" class=\"adventure-secondary adventure-sos-submit\" data-sos-join>交给团长</button><span class=\"adventure-sos-local\">登记只保存在你的浏览器里。</span></form><section class=\"adventure-sos-receipt\" hidden aria-live=\"polite\"><div class=\"adventure-sos-receipt-head\"><h3>临时团员证</h3><span data-sos-number></span></div><p><strong data-sos-name></strong><span> / </span><span data-sos-role></span></p><p class=\"adventure-sos-approval\">批准。下次开会记得带点零食。</p><div class=\"adventure-sos-receipt-foot\"><time data-sos-date></time><button type=\"button\" class=\"adventure-sos-edit\">重新填表</button></div></section></details>";
     const characters = body.querySelector('.adventure-character-list');
     const notePortrait = body.querySelector('.adventure-note-portrait');
     const line = body.querySelector('.adventure-konata-line');
@@ -364,7 +517,7 @@
       mikoto: ['给我？那我就不客气了。', '剩下那块留给还没吃的人吧。'],
       azusa: ['吃完这一块就练习。说好了哦。', '又吃一块的话，练习要拖到什么时候啊。'],
       kuroneko: ['既然是你的心意，我就收下了。', '再吃一块……只是因为茶还没喝完。'],
-      saber: ['谢谢。很好吃。', '还有吗？']
+      yui: ['好吃！你也吃一块吧。', '再来一块，就能好好练习了。']
     };
     function setAction() {
       action.hidden = scene === 'notes';
@@ -388,6 +541,10 @@
       notePortrait.style.setProperty('--portrait-y', character.y);
       body.querySelector('[data-character-speaker]').textContent = character.name;
       body.querySelector('[data-character-work]').textContent = character.work;
+      const guest = body.querySelector('[data-room-guest]');
+      const art = { konata: '/img/easter-eggs/konata-room-cutout.webp', yui: '/img/easter-eggs/yui-room-cutout.webp' };
+      guest.hidden = !art[character.id];
+      if (art[character.id]) { guest.src = art[character.id]; guest.alt = character.name + '的部室立绘'; }
       line.textContent = text === undefined ? character.notes[noteIndexes[index]] : text;
       setAction();
     }
@@ -401,6 +558,12 @@
       button.innerHTML = '<span class="adventure-character-portrait" aria-hidden="true"></span><span class="adventure-character-name"></span>';
       button.querySelector('.adventure-character-portrait').style.setProperty('--portrait-x', character.x);
       button.querySelector('.adventure-character-portrait').style.setProperty('--portrait-y', character.y);
+      if (character.portrait) {
+        const portrait = button.querySelector('.adventure-character-portrait');
+        portrait.style.backgroundImage = 'url("' + character.portrait + '")';
+        portrait.style.backgroundSize = 'cover';
+        portrait.style.backgroundPosition = 'center';
+      }
       button.querySelector('.adventure-character-name').textContent = character.name;
       button.addEventListener('click', () => showCharacter(index, scene === 'snack' ? 'snack' : 'notes'));
       button.addEventListener('keydown', event => {
@@ -494,7 +657,7 @@
         const character = clubCharacters[selectedCharacter];
         const count = treatsGiven[selectedCharacter]++;
         const replies = treatReplies[character.id];
-        const response = character.id === 'saber' && count >= 2 ? '点心很不错。晚饭呢？' : replies[Math.min(count, replies.length - 1)];
+        const response = character.id === 'yui' && count >= 2 ? '……糟了，忘了给梓留一块。' : replies[Math.min(count, replies.length - 1)];
         showCharacter(selectedCharacter, 'snack', response);
       }
     });
