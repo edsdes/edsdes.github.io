@@ -273,3 +273,6 @@
   #article-container .ctf-playground .ctf-mentor-art { float: right; width: 92px; margin: 0 0 6px 12px; }
   #article-container .ctf-playground .ctf-mentor-art .ctf-mentor-cutout { max-height: 138px; }
 }
+
+/* Leave room to read the final borrowing example on a phone. */
+#article-container .ctf-playground [data-mentor-message='source'] { white-space: pre-line; overflow-wrap: anywhere; }
