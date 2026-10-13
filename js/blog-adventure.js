@@ -99,7 +99,7 @@
     found.add(id);
     try { localStorage.setItem(KEY, JSON.stringify({ found: ids.filter(saved => found.has(saved)) })); } catch (_) {}
     sync();
-    if (!options.quiet && (activeDialog || found.size === ids.length)) notice(found.size === ids.length ? '恭喜你，八个彩蛋已全部找齐。彩蛋簿里有一张纪念卡和一封信，留给你。' : '找到「' + entries.find(entry => entry.id === id).title + '」 · ' + found.size + '/8');
+    if (!options.quiet && (activeDialog || found.size === ids.length)) notice(found.size === ids.length ? '八枚彩蛋都收好了。最后那封信，可以拆开看看了。' : '找到「' + entries.find(entry => entry.id === id).title + '」 · ' + found.size + '/8');
     return true;
   }
   function closePanel() { activeDialog?.close(); }
@@ -216,8 +216,7 @@
     }
     const dialog = panel('keepsake', '狂三的留念', '拿去留着吧。纪念卡、壁纸和书签，都可以换着挑。');
     const body = dialog.querySelector('.adventure-panel-body');
-    body.innerHTML = '<nav class="adventure-keepsake-formats" aria-label="礼物样式"><button type="button" data-keepsake-format="card" aria-pressed="true">纪念卡</button><button type="button" data-keepsake-format="wallpaper" aria-pressed="false">手机壁纸</button><button type="button" data-keepsake-format="bookmark" aria-pressed="false">角色书签</button></nav><div class="adventure-keepsake-choices" data-keepsake-covers role="group" aria-label="纪念卡画面"><button type="button" data-keepsake-cover="kurumi" aria-pressed="true">狂三</button><button type="button" data-keepsake-cover="club" aria-pressed="false">部室合照</button><button type="button" data-keepsake-cover="tea" aria-pressed="false">下午茶</button></div><div class="adventure-keepsake-choices" data-keepsake-characters role="group" aria-label="选择角色" hidden><button type="button" data-keepsake-character="kurumi" aria-pressed="true">时崎狂三</button><button type="button" data-keepsake-character="konata" aria-pressed="false">此方</button><button type="button" data-keepsake-character="yui" aria-pressed="false">平泽唯</button><button type="button" data-keepsake-character="chino" aria-pressed="false">香风智乃</button></div><figure class="adventure-keepsake-picture" data-keepsake-preview="card" aria-busy="true"><img data-keepsake-image hidden alt="时崎狂三的全收集纪念卡" width="1600" height="1160"><p data-keepsake-loading role="status" aria-live="polite">纪念卡准备中…</p></figure><p class="adventure-keepsake-caption" data-keepsake-caption>1600 × 1160 / 狂三</p><form class="adventure-keepsake-signature"><label for="adventure-keepsake-name">留给<input id="adventure-keepsake-name" data-keepsake-name maxlength="20" autocomplete="nickname" placeholder="来小站做客的你"></label><button type="submit" class="adventure-secondary" data-keepsake-update data-keepsake-personalize>更新署名</button></form><p class="adventure-keepsake-text"></p><div class="adventure-keepsake-actions"><a data-keepsake-save hidden download>保存纪念卡</a><button type="button" class="adventure-secondary" data-keepsake-retry hidden>再试一次</button><button type="button" class="adventure-secondary" data-back-book>回彩蛋簿</button><button type="button" class="adventure-secondary" data-keepsake-cash>领 5 元小红包</button></div><p class="adventure-keepsake-tip">手机上也可以长按图片保存。</p>';
-    body.querySelector('.adventure-keepsake-text').textContent = greeting;
+    body.innerHTML = '<nav class="adventure-keepsake-formats" aria-label="礼物样式"><button type="button" data-keepsake-format="card" aria-pressed="true">纪念卡</button><button type="button" data-keepsake-format="wallpaper" aria-pressed="false">手机壁纸</button><button type="button" data-keepsake-format="bookmark" aria-pressed="false">角色书签</button></nav><div class="adventure-keepsake-choices" data-keepsake-covers role="group" aria-label="纪念卡画面"><button type="button" data-keepsake-cover="kurumi" aria-pressed="true">狂三</button><button type="button" data-keepsake-cover="club" aria-pressed="false">部室合照</button><button type="button" data-keepsake-cover="tea" aria-pressed="false">下午茶</button></div><div class="adventure-keepsake-choices" data-keepsake-characters role="group" aria-label="选择角色" hidden><button type="button" data-keepsake-character="kurumi" aria-pressed="true">时崎狂三</button><button type="button" data-keepsake-character="konata" aria-pressed="false">此方</button><button type="button" data-keepsake-character="yui" aria-pressed="false">平泽唯</button><button type="button" data-keepsake-character="chino" aria-pressed="false">香风智乃</button></div><figure class="adventure-keepsake-picture" data-keepsake-preview="card" aria-busy="true"><img data-keepsake-image hidden alt="时崎狂三的全收集纪念卡" width="1600" height="1160"><p data-keepsake-loading role="status" aria-live="polite">纪念卡准备中…</p></figure><p class="adventure-keepsake-caption" data-keepsake-caption>1600 × 1160 / 狂三</p><form class="adventure-keepsake-signature"><label for="adventure-keepsake-name">留给<input id="adventure-keepsake-name" data-keepsake-name maxlength="20" autocomplete="nickname" placeholder="来小站做客的你"></label><button type="submit" class="adventure-secondary" data-keepsake-update data-keepsake-personalize>更新署名</button></form><div class="adventure-keepsake-actions"><a data-keepsake-save hidden download>保存纪念卡</a><button type="button" class="adventure-secondary" data-keepsake-retry hidden>再试一次</button><button type="button" class="adventure-secondary" data-back-book>回彩蛋簿</button><button type="button" class="adventure-secondary" data-keepsake-cash>领 5 元小红包</button></div><p class="adventure-keepsake-tip">手机上也可以长按图片保存。</p>';
     const image = body.querySelector('[data-keepsake-image]');
     const frame = body.querySelector('.adventure-keepsake-picture');
     const loading = body.querySelector('[data-keepsake-loading]');
@@ -434,12 +433,9 @@
       ctx.moveTo(70, 976);
       ctx.lineTo(1530, 976);
       ctx.stroke();
-      const cialloAt = greeting.indexOf('Ciallo');
       ctx.fillStyle = '#56594f';
-      ctx.font = '25px ' + sans;
-      ctx.fillText(greeting.slice(0, cialloAt), 70, 1023, 1460);
       ctx.font = '34px ' + sans;
-      ctx.fillText(greeting.slice(cialloAt), 70, 1070);
+      ctx.fillText('Ciallo～(∠・ω< )⌒★', 70, 1046);
       ctx.fillStyle = '#858476';
       ctx.font = '20px ' + sans;
       ctx.fillText('留给 ' + selection.recipient, 70, 1120, 800);

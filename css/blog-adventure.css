@@ -60,7 +60,6 @@
 .adventure-keepsake-picture img { display: block; width: 100%; height: 100%; object-fit: contain; }
 .adventure-keepsake-picture p { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; margin: 0; padding: 20px; color: var(--adv-muted); font-size: 12px; line-height: 1.8; text-align: center; }
 .adventure-keepsake-caption { margin: 8px 0 16px; color: var(--adv-muted); font-size: 10px; line-height: 1.8; }
-.adventure-keepsake-text { margin: 0 0 12px; font-size: 12px; line-height: 1.9; overflow-wrap: anywhere; }
 .adventure-keepsake-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 18px; }
 .adventure-keepsake-actions a { display: inline-flex; align-items: center; min-height: 44px; padding: 9px 15px; border: 1px solid var(--adv-line); border-radius: 3px; background: var(--adv-paper); color: var(--adv-accent); font-size: 12px; line-height: 1.8; text-decoration: none; }
 .adventure-keepsake-actions a:hover { border-color: var(--adv-accent); }
