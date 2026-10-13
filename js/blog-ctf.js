@@ -5,26 +5,26 @@
   if (!root || window.__blogCtfInstalled) return;
   window.__blogCtfInstalled = true;
   const KEY = 'blog-ctf-v1';
-  const SIGNAL = 'c3ludHt1cnl5Yl9zZWJ6X2d1cl9iZ3VyZV9mdnFyfQ==';
+  const SIGNAL = 'ZnZpaHtrb3hpdWFfa294dV90aG9fYWJ2ZV9wd3NfeW9lfQ==';
   const ids = ['signal', 'source', 'stack'];
   const flags = {
-    signal: 'flag{hello_from_the_other_side}',
-    source: 'flag{curiosity_is_a_superpower}',
+    signal: 'flag{konata_kept_the_save_for_you}',
+    source: 'flag{same_query_two_readers}',
     stack: 'flag{one_small_step_into_win}'
   };
   const explanations = {
-    signal: '收信成功。先用 Base64 还原外层，再用 ROT13 还原字母，才是完整的 flag。',
-    source: '纸条拼好了。HTML 注释不会显示在页面上；按 01、02、03 的编号连接内容，就能得到完整 flag。',
+    signal: '收信成功。Base64 还原外层；坐标路线倒着走得到 AKIBA，Vigenère 再用这个密钥还原字母。只有英文字母推进密钥位置，符号留在原处。',
+    source: '拿到便签了。同一份申请，登记处检查原始名称，资料柜先 URL 解码再取最后一个同名值。检查和使用前的解析规则应该一致。',
     stack: '模型进入 win()！24 字节填充后，接 8 字节 ret() 地址和 8 字节 win() 地址，共 40 字节。额外 ret 弹出 8 字节后，入口 RSP % 16 = 8。'
   };
   const hints = {
-    signal: ['此方：外面看着像 Base64。先把收到的信解开看看。', '此方：synt 和 flag 长得有点像。字母可能又转了一圈，试试 ROT13。', '此方：先选 Base64 解码，把得到的文字复制回工作台，再选 ROT13。两个工具接着用，不是二选一。'],
-    source: ['春日：页面上只有半句话？那就看看部室的源码。', '春日：注释里有三张纸条，都带着编号。先把它们圈出来。', '春日：按 01、02、03 排好，去掉编号和注释符号，把三段内容直接接起来。'],
+    signal: ['此方：信的外面包了一层 Base64。先拆开看看，里面的字母也许还不是原文。', '此方：坐标是列字母加行号。便签说从终点抄回来，所以要把五个坐标倒着走，再去字母格里取字。', '此方：那几个字母是密钥。选 Vigenère，把刚才读出的密文和密钥放进去。', '此方：倒着走取出的是 AKIBA。Vigenère 只在遇到英文字母时推进密钥；花括号和下划线不占位置。'],
+    source: ['春日：先看登记处和资料柜的规则。同一份申请，两个地方的读法一样吗？', '春日：登记处检查的是原始参数名，资料柜会先做 URL 解码。按字节编码的小工具也许用得上。', '春日：两种写法可以还原成同一个名字。原文别重复，解码后的后一个值又会覆盖前一个。', '春日：试试 club=ordinary&cl%75b=sos&item=snack。第二个名字解码后也是 club，资料柜最后读到的是 sos。'],
     stack: ['红莉栖：buf 16 字节，RBP 8 字节。返回地址从偏移 24 开始，先把位置摆对。', '红莉栖：选 win()。地址正确还不够，这个模型要求入口 RSP % 16 = 8；直接返回进去是 0。', '红莉栖：填充保持 24，在 win() 前接一个 ret()。它再弹出 8 字节，入口余数就从 0 变成 8。']
   };
   const reactions = {
-    signal: { win: '此方：两层都拆开了。下次记得先看看里面还有没有一层。', wrong: '此方：是不是还有一层没解？把工作台的结果再看一眼。' },
-    source: { win: '春日：三张拼起来了。这个团员眼力还行！', wrong: '春日：按编号排纸条，别把编号也抄进答案里。' },
+    signal: { win: '此方：读到了。存档还给你留着，刚好能接着玩。', wrong: '此方：先别急着交，桌上那张便签还没看完吧？' },
+    source: { win: '春日：便签和点心都拿回来了。今天算你立功啦。', wrong: '春日：先拿到 SOS 盒子里的便签，再把它交给我。' },
     stack: { win: '红莉栖：位置和对齐都对了。这次可以放你进 win()。', wrong: '红莉栖：先看 RIP 的值，再决定改填充还是改地址。' }
   };
   const hintSteps = { signal: 0, source: 0, stack: 0 };
@@ -114,7 +114,11 @@
       const answer = form.querySelector('input').value.trim();
       if (answer === flags[id]) earn(id);
       else {
-        feedback(id, answer.startsWith('flag{') ? '检查大小写和花括号里的内容，再试试。' : '把找到的 flag{...} 填在这里。', false);
+        const wrongMessage = id === 'source'
+          ? 'SOS便签还没对上。看看申请有没有拿到正确盒子，别把普通部的回信当答案。'
+          : id === 'signal' ? '这次的信还没读通。看看便签的方向，确认密钥和大小写。'
+          : (answer.startsWith('flag{') ? '检查大小写和花括号里的内容，再试试。' : '把找到的 flag{...} 填在这里。');
+        feedback(id, wrongMessage, false);
         say(id, reactions[id].wrong);
       }
     });
@@ -128,20 +132,32 @@
     try { return new TextDecoder('utf-8', { fatal: true }).decode(bytes); }
     catch (_) { throw new Error('这些字节不是完整的 UTF-8 文本。检查有没有漏掉一段。'); }
   }
-  function decodeSignal(input, mode) {
+  function decodeSignal(input, mode, rawKey = '') {
     if (!input.trim()) throw new Error('先放一段要解码的文字。');
     if (input.length > 3000) throw new Error('这张纸条最多放 3000 个字符，短一点再试。');
     if (mode === 'rot13') return input.replace(/[A-Za-z]/g, letter => {
       const start = letter <= 'Z' ? 65 : 97;
       return String.fromCharCode(start + (letter.charCodeAt(0) - start + 13) % 26);
     });
+    if (mode === 'vigenere') {
+      const normalized = rawKey.replace(/[ \t\r\n\f\v]/g, '');
+      if (!normalized) throw new Error('还差一个密钥。看看此方留下的便签。');
+      if (!/^[A-Za-z]{1,64}$/.test(normalized)) throw new Error('密钥只用 1 到 64 个英文字母，可以夹着空格。');
+      const key = normalized.toUpperCase();
+      let position = 0;
+      return input.replace(/[A-Za-z]/g, letter => {
+        const start = letter <= 'Z' ? 65 : 97;
+        const shift = key.charCodeAt(position++ % key.length) - 65;
+        return String.fromCharCode(start + (letter.charCodeAt(0) - start - shift + 26) % 26);
+      });
+    }
     const compact = input.replace(/\s/g, '');
     if (mode === 'hex') {
       if (!/^[0-9a-fA-F]+$/.test(compact)) throw new Error('Hex 只用 0–9、a–f；可以用空格分开字节。');
       if (compact.length % 2) throw new Error('Hex 每两个字符是一字节，现在少了半个字节。');
       return decodeBytes(Uint8Array.from(compact.match(/../g), pair => parseInt(pair, 16)));
     }
-    if (mode !== 'base64') throw new Error('先选 Base64、Hex 或 ROT13。');
+    if (mode !== 'base64') throw new Error('先选 Base64、Hex、ROT13 或 Vigenère。');
     if (!/^[A-Za-z0-9+/]*={0,2}$/.test(compact) || compact.length % 4 === 1 ||
       (compact.includes('=') && compact.length % 4 !== 0)) {
       throw new Error('这段 Base64 的字符或长度不对。检查有没有多出的符号，等号只放在末尾。');
@@ -151,20 +167,26 @@
     catch (_) { throw new Error('Base64 没读出来。检查字符、长度和末尾的等号。'); }
     return decodeBytes(Uint8Array.from(binary, char => char.charCodeAt(0)));
   }
+  const signalKey = $('[data-signal-key]');
+  const signalKeyField = $('[data-signal-key-field]');
+  function showSignalKey() { if (signalKeyField) signalKeyField.hidden = codec?.value !== 'vigenere'; }
+  codec?.addEventListener('change', showSignalKey);
+  showSignalKey();
   function resetSignal() {
     if (wire) wire.value = SIGNAL;
     if (codec) codec.value = 'base64';
+    if (signalKey) signalKey.value = '';
+    showSignalKey();
     if (decoded) { decoded.hidden = true; decoded.textContent = ''; decoded.classList.remove('is-error'); }
   }
   decode?.addEventListener('click', () => {
     if (!decoded) return;
     decoded.hidden = false;
     try {
-      decoded.textContent = decodeSignal(wire ? wire.value : SIGNAL, codec ? codec.value : 'base64');
+      decoded.textContent = decodeSignal(wire ? wire.value : SIGNAL, codec ? codec.value : 'base64', signalKey ? signalKey.value : '');
       decoded.classList.remove('is-error');
-      if (/^synt\{/.test(decoded.textContent)) say('signal', '此方：花括号还在，字母却偏了点。把这段再用 ROT13 解一次？');
-      else if (codec?.value === 'rot13' && /^flag\{/.test(decoded.textContent)) say('signal', '此方：这回读得通了。交答案的时候别漏括号。');
-      else say('signal', '此方：这一层读出来了。你也可以换串 Hex 或 ROT13 玩玩。');
+      if (/^flag\{/.test(decoded.textContent)) say('signal', '此方：好像能读了。交答案的时候别漏括号。');
+      else say('signal', '此方：这一层读出来了。要是还看不懂，桌上的便签或许有用。');
     } catch (error) {
       decoded.textContent = error.message;
       decoded.classList.add('is-error');
@@ -176,43 +198,59 @@
     say('signal', '此方：最初那封信放回来了，通关记录还在。');
   });
 
-  const sourceToggle = $('.ctf-source-toggle');
-  const sourcePreview = $('.ctf-source-preview');
-  const sourceHighlight = $('[data-source-highlight]');
-  const sourceCode = sourcePreview?.querySelector('code');
-  const sourceText = $('[data-lobby]')?.outerHTML.replace(/></g, '>\n<') || '';
-  if (sourceCode) sourceCode.textContent = sourceText;
+  const webQuery = $('[data-web-query]');
+  const webResponse = $('[data-web-response]');
+  const webRule = $('[data-web-rule-code]');
+  const urlInput = $('[data-url-input]');
+  const urlOutput = $('[data-url-output]');
+  const webRules = {
+    desk: '登记处只看申请表原文：\n1. 用 & 分开参数，用第一个 = 分开名称和值。\n2. 同一个原始参数名出现两次，退回申请。\n3. 原始名称 club 的值必须是 ordinary。\n4. 其它名称暂时保留，交给资料柜。\n\n// 名称在这里还没有进行 URL 解码。',
+    cabinet: '资料柜按网页表单读申请：\nconst entries = new URLSearchParams(query);\nconst form = Object.fromEntries(entries);\n\n// 参数名和值都会解码。\n// 解码后同名的参数，后面一个覆盖前面一个。\n// club = sos 且 item = snack 时，取出 SOS 便签。'
+  };
   function resetSource() {
-    if (sourcePreview) sourcePreview.hidden = true;
-    if (sourceToggle) { sourceToggle.setAttribute('aria-expanded', 'false'); sourceToggle.textContent = '查看页面源码'; }
-    if (sourceCode) sourceCode.textContent = sourceText;
-    if (sourceHighlight) { sourceHighlight.hidden = true; sourceHighlight.disabled = false; sourceHighlight.textContent = '圈出注释'; }
+    if (webQuery) webQuery.value = 'club=ordinary&item=snack';
+    [webResponse, webRule, urlOutput].forEach(node => { if (node) { node.hidden = true; node.textContent = ''; } });
+    if (urlInput) urlInput.value = '';
+    root.querySelectorAll('[data-web-rule]').forEach(b => b.setAttribute('aria-pressed','false'));
   }
-  sourceToggle?.addEventListener('click', () => {
-    if (!sourcePreview) return;
-    sourcePreview.hidden = !sourcePreview.hidden;
-    sourceToggle.setAttribute('aria-expanded', String(!sourcePreview.hidden));
-    sourceToggle.textContent = sourcePreview.hidden ? '查看页面源码' : '合上源码';
-    if (sourceHighlight) sourceHighlight.hidden = sourcePreview.hidden;
+  function displayWeb(node, value) { if(node) { node.hidden = false; const order = ['status','error','note','message','desk','cabinet']; node.textContent = typeof value === 'string' ? value : JSON.stringify(Object.fromEntries(Object.entries(value).sort((a,b)=>order.indexOf(a[0])-order.indexOf(b[0]))),null,2); } }
+  function readApplication(raw) {
+    const query = raw.trim().replace(/^\?/, '');
+    if (!query || new TextEncoder().encode(query).length > 2000) return { status:400, error:'申请为空或超过 2000 字节。' };
+    if (/%(?![0-9a-fA-F]{2})/.test(query)) return { status:400, error:'百分号编码不完整，每个 % 后面要有两位十六进制数字。' };
+    const entries = query.split('&').filter(Boolean).map(part => { const at=part.indexOf('='); return at<0 ? [part,''] : [part.slice(0,at),part.slice(at+1)]; });
+    if (!entries.length || entries.length>32) return { status:400,error:'申请最多放 32 个参数。' };
+    const seen = new Set();
+    for(const [name] of entries) { if(seen.has(name))return {status:400,desk:entries,error:'登记处发现重复的原始参数名：'+name+'。申请退回。'}; seen.add(name); }
+    const club = entries.find(pair=>pair[0]==='club');
+    if(!club || club[1]!=='ordinary')return {status:403,desk:entries,error:'登记处只受理原始 club=ordinary 的申请。'};
+    const cabinet = Object.fromEntries(new URLSearchParams(query));
+    if(cabinet.item!=='snack' || !['ordinary','sos'].includes(cabinet.club))return {status:404,desk:entries,cabinet,error:'资料柜没找到这个社团的点心条目。'};
+    if(cabinet.club==='sos')return {status:200,desk:entries,cabinet,note:flags.source,message:'团长的便签拿到了。把上面的 flag 交给春日吧。'};
+    return {status:200,desk:entries,cabinet,message:'取到普通部的饼干。SOS 的便签还在另一个盒子里。'};
+  }
+  $('[data-web-send]')?.addEventListener('click', () => {
+    const result=readApplication(webQuery?.value || '');
+    displayWeb(webResponse,result);
+    say('source',result.note ? '春日：便签拿回来了。饼干也给你留一块～' : result.status===200 ? '春日：还是普通部的盒子。看看两个窗口究竟怎么读这份申请。' : '春日：申请卡住了。退回理由和窗口规则放一起看。');
   });
-  sourceHighlight?.addEventListener('click', () => {
-    if (!sourceCode || sourcePreview.hidden) return;
-    const fragment = document.createDocumentFragment();
-    const comments = /<!--[\s\S]*?-->/g;
-    let end = 0;
-    for (const match of sourceText.matchAll(comments)) {
-      fragment.append(document.createTextNode(sourceText.slice(end, match.index)));
-      const mark = document.createElement('mark');
-      mark.className = 'ctf-code-note';
-      mark.textContent = match[0];
-      fragment.append(mark);
-      end = match.index + match[0].length;
-    }
-    fragment.append(document.createTextNode(sourceText.slice(end)));
-    sourceCode.replaceChildren(fragment);
-    sourceHighlight.disabled = true;
-    sourceHighlight.textContent = '纸条已圈出';
-    say('source', '春日：这些纸条有编号。先排顺序，再把内容连起来。');
+  root.querySelectorAll('[data-web-rule]').forEach(button=>button.addEventListener('click',()=>{
+    const name=button.dataset.webRule;
+    if(!Object.hasOwn(webRules,name))return;
+    displayWeb(webRule,webRules[name]);
+    root.querySelectorAll('[data-web-rule]').forEach(b=>b.setAttribute('aria-pressed',String(b===button)));
+  }));
+  $('[data-url-encode]')?.addEventListener('click',()=>{
+    const value=urlInput?.value || '';
+    if(!value || value.length>3000) {displayWeb(urlOutput,'先放一段文字，最多 3000 个字符。');return;}
+    const bytes=new TextEncoder().encode(value);
+    displayWeb(urlOutput,Array.from(bytes,b=>'%'+b.toString(16).padStart(2,'0')).join(''));
+  });
+  $('[data-url-decode]')?.addEventListener('click',()=>{
+    const value=urlInput?.value || '';
+    if(!value || value.length>3000) {displayWeb(urlOutput,'先放一段编码，最多 3000 个字符。');return;}
+    try {displayWeb(urlOutput,decodeURIComponent(value));}
+    catch(_) {displayWeb(urlOutput,'这串编码没读通。检查 % 后的两位数字和 UTF-8 字节有没有缺失。');}
   });
 
   const padding = $('#ctf-padding');
