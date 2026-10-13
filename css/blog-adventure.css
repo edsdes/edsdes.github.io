@@ -294,3 +294,12 @@
 @media(max-width:500px) { .adventure-cash-gift { grid-template-columns: minmax(0,1fr) 64px; gap: 10px; } .adventure-cash-gift img { width: 64px; height: 105px; } .adventure-cash-gift h3 { font-size: 15px; } }
 
 .adventure-cash-gift .adventure-cash-limit { margin: 8px 0 12px; color: var(--adv-muted); font-size: 12px; line-height: 1.9; }
+
+/* The clock opens once when a freshly prepared keepsake appears. */
+.adventure-keepsake-ceremony { position: absolute; inset: 0; z-index: 1; display: block; width: 100%; height: 100%; pointer-events: none; }
+.adventure-keepsake-picture.is-celebrating [data-keepsake-image] { animation: adventure-keepsake-reveal 950ms cubic-bezier(.16,1,.3,1) both; transform-origin: 50% 46%; }
+@keyframes adventure-keepsake-reveal { from { transform: scale(.985); } to { transform: scale(1); } }
+@media (prefers-reduced-motion: reduce) {
+  .adventure-keepsake-ceremony { display: none; }
+  .adventure-keepsake-picture.is-celebrating [data-keepsake-image] { animation: none; }
+}

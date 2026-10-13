@@ -252,6 +252,121 @@
     const sans = '"Microsoft YaHei", "Yu Gothic", Arial, sans-serif';
     let format = 'card', character = 'kurumi', cover = 'kurumi', revision = 0, closed = false, renderController = null, currentBlob = null;
     const pictures = new Map();
+    let ceremonyPlayed = false, stopCeremony = () => {};
+    function celebrateKeepsake() {
+      if (ceremonyPlayed || closed || !dialog.open) return;
+      ceremonyPlayed = true;
+      const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
+      if (motion.matches || document.hidden || format !== 'card') return;
+      const width = frame.clientWidth, height = frame.clientHeight;
+      if (!width || !height) return;
+      const canvas = document.createElement('canvas');
+      canvas.className = 'adventure-keepsake-ceremony';
+      canvas.setAttribute('aria-hidden', 'true');
+      const density = Math.min(window.devicePixelRatio || 1, 2);
+      canvas.width = Math.round(width * density);
+      canvas.height = Math.round(height * density);
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
+      ctx.scale(density, density);
+      // Confine the glow to the photograph; the letter stays clear.
+      ctx.beginPath(); ctx.rect(width * .0375, height * .052, width * .925, height * .718); ctx.clip();
+      const cx = width * .76, cy = height * .31, radius = Math.min(width * .17, height * .23);
+      const haze = ctx.createRadialGradient(cx, cy, 0, cx, cy, width * .65);
+      haze.addColorStop(0, '#d6a84e20');
+      haze.addColorStop(1, '#23110b70');
+      const stars = Array.from({ length: width < 400 ? 24 : 36 }, () => ({
+        angle: Math.random() * Math.PI * 2,
+        travel: .8 + Math.random() * 2.4,
+        size: .6 + Math.random() * 1.3,
+        delay: Math.random() * .16,
+        spin: Math.random() * 2 - 1
+      }));
+      const numerals = ['XII', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI'];
+      const started = performance.now(), duration = 2400;
+      let request = 0, finished = false;
+      function cleanup() {
+        if (finished) return;
+        finished = true;
+        cancelAnimationFrame(request);
+        clearTimeout(timeout);
+        document.removeEventListener('visibilitychange', onVisibility);
+        window.removeEventListener('resize', cleanup);
+        motion.removeEventListener('change', cleanup);
+        canvas.remove();
+        frame.classList.remove('is-celebrating');
+      }
+      function onVisibility() { if (document.hidden) cleanup(); }
+      function smooth(value) { const t = Math.max(0, Math.min(1, value)); return t * t * (3 - 2 * t); }
+      function draw(now) {
+        if (finished || closed || !dialog.open) { cleanup(); return; }
+        const progress = Math.min(1, (now - started) / duration);
+        if (progress >= 1) { cleanup(); return; }
+        const opened = 1 - Math.pow(1 - Math.min(1, progress / .44), 3);
+        const fade = smooth(progress / .09) * (1 - smooth((progress - .46) / .54));
+        ctx.clearRect(0, 0, width, height);
+        ctx.globalAlpha = fade * .4;
+        ctx.fillStyle = haze; ctx.fillRect(0, 0, width, height);
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.scale(.55 + opened * .65, .55 + opened * .65);
+        ctx.rotate((opened - 1) * .22);
+        ctx.globalAlpha = fade * .92;
+        ctx.strokeStyle = '#f3d397'; ctx.lineWidth = 1;
+        ctx.shadowColor = '#eab872'; ctx.shadowBlur = 7;
+        for (const ring of [1, .95, .8]) {
+          ctx.beginPath(); ctx.arc(0, 0, radius * ring, 0, Math.PI * 2); ctx.stroke();
+        }
+        ctx.shadowBlur = 0;
+        for (let tick = 0; tick < 60; tick++) {
+          const angle = tick * Math.PI / 30;
+          const inner = radius * (tick % 5 ? .91 : .86);
+          ctx.beginPath();
+          ctx.moveTo(Math.sin(angle) * inner, -Math.cos(angle) * inner);
+          ctx.lineTo(Math.sin(angle) * radius * .945, -Math.cos(angle) * radius * .945);
+          ctx.stroke();
+        }
+        ctx.fillStyle = '#ffe4ad';
+        ctx.font = Math.max(8, radius * .1) + 'px Georgia, serif';
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        numerals.forEach((text, i) => {
+          const angle = i * Math.PI / 6;
+          ctx.fillText(text, Math.sin(angle) * radius * .68, -Math.cos(angle) * radius * .68);
+        });
+        ctx.lineWidth = 1.5;
+        for (const hand of [{ angle: -.72 + opened * .35, length: .43 }, { angle: 1.1 + opened * .7, length: .55 }]) {
+          ctx.beginPath(); ctx.moveTo(0, 0);
+          ctx.lineTo(Math.sin(hand.angle) * radius * hand.length, -Math.cos(hand.angle) * radius * hand.length);
+          ctx.stroke();
+        }
+        ctx.beginPath(); ctx.arc(0, 0, 2.5, 0, Math.PI * 2); ctx.fill();
+        ctx.restore();
+        stars.forEach(star => {
+          const t = Math.max(0, Math.min(1, (progress - star.delay) / (1 - star.delay)));
+          if (!t) return;
+          const distance = radius * (.27 + star.travel * (1 - Math.pow(1 - t, 2)));
+          const angle = star.angle + star.spin * t * .12;
+          const x = cx + Math.cos(angle) * distance;
+          const y = cy + Math.sin(angle) * distance + t * t * height * .09;
+          const size = star.size * (1 + Math.sin(t * Math.PI));
+          ctx.globalAlpha = Math.sin(t * Math.PI) * (1 - smooth((progress - .55) / .45));
+          ctx.fillStyle = '#ffe7ad'; ctx.beginPath();
+          ctx.moveTo(x, y - size * 2); ctx.lineTo(x + size * .55, y);
+          ctx.lineTo(x, y + size * 2); ctx.lineTo(x - size * .55, y);
+          ctx.closePath(); ctx.fill();
+        });
+        ctx.globalAlpha = 1;
+        request = requestAnimationFrame(draw);
+      }
+      stopCeremony = cleanup;
+      const timeout = setTimeout(cleanup, duration + 300);
+      document.addEventListener('visibilitychange', onVisibility);
+      window.addEventListener('resize', cleanup, { once: true });
+      motion.addEventListener('change', cleanup, { once: true });
+      frame.append(canvas);
+      frame.classList.add('is-celebrating');
+      request = requestAnimationFrame(draw);
+    }
     function retire(record) {
       if (!record || record.retired) return;
       record.retired = true;
@@ -403,6 +518,7 @@
       save.textContent = details.save;
     }
     async function prepare() {
+      stopCeremony();
       const renderId = ++revision;
       renderController?.abort();
       const controller = new AbortController();
@@ -453,6 +569,7 @@
         save.href = candidate.url;
         save.download = '小站留念-' + details.name + (selection.format === 'card' ? '' : '-' + portraits[selection.character].name) + '-' + date.replaceAll('.', '') + '.png';
         save.hidden = false;
+        celebrateKeepsake();
       } catch (_) {
         retire(candidate);
         if (!current()) return;
@@ -503,6 +620,7 @@
     body.querySelector('[data-keepsake-cash]').addEventListener('click', () => { if(found.size!==ids.length)return; openBook(); activeDialog.querySelector('[data-cash-quick]').click(); });
     dialog.addEventListener('close', () => {
       closed = true;
+      stopCeremony();
       ++revision;
       renderController?.abort();
       retire(currentBlob);
