@@ -563,7 +563,7 @@
       body.querySelector('[data-character-speaker]').textContent = character.name;
       body.querySelector('[data-character-work]').textContent = character.work;
       const guest = body.querySelector('[data-room-guest]');
-      const art = { konata: '/img/easter-eggs/konata-room-cutout.webp', yui: '/img/easter-eggs/yui-room-cutout.webp' };
+      const art = {"haruhi":"/img/easter-eggs/haruhi-club-cutout-v8.webp","konata":"/img/easter-eggs/konata-room-cutout.webp","kurisu":"/img/easter-eggs/kurisu-ctf-cutout.webp","yuki":"/img/easter-eggs/yuki-club-cutout-v8.webp","mikoto":"/img/easter-eggs/mikoto-club-cutout-v8.webp","azusa":"/img/easter-eggs/azusa-club-cutout-v8.webp","kuroneko":"/img/easter-eggs/kuroneko-club-cutout-v8.webp","yui":"/img/easter-eggs/yui-room-cutout.webp"};
       guest.hidden = !art[character.id];
       if (art[character.id]) { guest.src = art[character.id]; guest.alt = character.name + '的部室立绘'; }
       line.textContent = text === undefined ? character.notes[noteIndexes[index]] : text;
@@ -722,6 +722,7 @@
     const body = dialog.querySelector('.adventure-panel-body');
     if (labSaved) lab = readLab(lab);
     body.innerHTML = '<figure class="adventure-lab-scene"><img src="/img/easter-eggs/lab-night.webp" alt="夜晚的未来道具研究所，红莉栖在旧电脑与辉光管前工作" width="1536" height="768" decoding="async"><figcaption><span>世界线观测值</span><output data-worldline></output></figcaption></figure><div class="adventure-terminal"><div class="adventure-terminal-bar"><span>LAB / visitor@future-gadget</span><span>接続中</span></div><div class="adventure-terminal-output" role="log" aria-live="polite" aria-label="终端消息" tabindex="0"></div><form class="adventure-terminal-form"><label for="adventure-command" aria-label="终端命令">lab <span aria-hidden="true">&gt;</span></label><input id="adventure-command" type="text" placeholder="help" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="120"><button type="submit">执行</button></form></div><div class="adventure-terminal-shortcuts"><button type="button" data-command="help">help</button><button type="button" data-command="ls">ls</button><button type="button" data-command="observe">观测世界线</button><button type="button" data-command="inbox">D-mail 信箱</button></div>';
+    body.insertAdjacentHTML('beforeend', '<aside class="adventure-panel-companion"><p>红莉栖：电脑给你用。别把实验记录弄丢了。</p><img src="/img/easter-eggs/kurisu-ctf-cutout.webp" alt="红莉栖拿着研究所的实验记录" width="800" height="1200" decoding="async"></aside>');
     const output = body.querySelector('.adventure-terminal-output');
     const input = body.querySelector('#adventure-command');
     const display = body.querySelector('[data-worldline]');
@@ -792,6 +793,7 @@
     const dialog = panel('wish', '部室抽签', '有些是社团杂物，有些是提瓦特带回来的东西。随便抽一张。');
     const body = dialog.querySelector('.adventure-panel-body');
     body.innerHTML = '<section class="adventure-wish-sky"><img class="adventure-wish-picture" src="/img/easter-eggs/sos-clubroom.webp" alt="午后的动漫部室" width="1536" height="768" decoding="async"><div class="adventure-wish-result" role="status" aria-live="polite"><span class="adventure-wish-rarity">· · ·</span><h3>箱子里还有几张纸条</h3><p>团长说这是今天的活动。至少不用出门。</p></div><button class="adventure-wish-button" type="button" data-wish>抽一张</button></section><p class="adventure-wish-note">今天抽到的，归你啦。找齐彩蛋后，会多一张金色便签。</p>';
+    body.insertAdjacentHTML('beforeend', '<aside class="adventure-panel-companion"><p data-wish-host-line>智乃：抽完以后，茶也给你留一杯。</p><img data-wish-host src="/img/easter-eggs/chino-room-cutout.webp" alt="智乃端着部室的下午茶" width="800" height="1200" decoding="async"></aside>');
     const pool = [
       { title: '此方的游戏存档', stars: 3, text: '「就玩五分钟」的存档。修改时间：凌晨两点。' },
       { title: '派蒙留下的零食袋', stars: 3, text: '袋子里是空的。上面有一张便签：应急食品已经吃完应急食品了。' },
@@ -829,6 +831,12 @@
         result.classList.toggle('is-gold', item.stars === 5);
         const picture = body.querySelector('.adventure-wish-picture');
         if (item.title === '狂三的怀表') { picture.src = '/img/easter-eggs/kurumi-keepsake-scene.webp'; picture.alt = '时崎狂三与暮色中的钟楼'; }
+        else { picture.src = '/img/easter-eggs/sos-clubroom.webp'; picture.alt = '午后的动漫部室'; }
+        const hosts = { '此方的游戏存档': ['此方', '/img/easter-eggs/konata-room-cutout.webp'], '长门的借书卡': ['长门', '/img/easter-eggs/yuki-club-cutout-v8.webp'], '研究所的瓶盖': ['红莉栖', '/img/easter-eggs/kurisu-ctf-cutout.webp'], 'SOS 团的放假通知': ['春日', '/img/easter-eggs/haruhi-club-cutout-v8.webp'], '狂三的怀表': ['狂三', '/img/easter-eggs/kurumi-keepsake-cutout.webp'] };
+        const host = hosts[item.title] || ['智乃', '/img/easter-eggs/chino-room-cutout.webp'];
+        body.querySelector('[data-wish-host]').src = host[1];
+        body.querySelector('[data-wish-host]').alt = host[0] + '的部室立绘';
+        body.querySelector('[data-wish-host-line]').textContent = host[0] + '：这张归你，收好啦。';
         sky.classList.remove('is-drawing');
         button.disabled = false;
         button.textContent = '再抽一张';

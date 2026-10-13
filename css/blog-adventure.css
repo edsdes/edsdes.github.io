@@ -273,3 +273,10 @@
   .adventure-dialog[data-panel='book'] .adventure-stamp [data-entry-state] { margin-left: 0; }
   .adventure-dialog[data-panel='book'] .adventure-entry-link { max-width: 100%; }
 }
+
+/* Someone at the desk, with their own illustration. */
+.adventure-panel-companion { display: flex; align-items: center; justify-content: space-between; gap: 18px; margin: 12px 0 0; }
+.adventure-panel-companion p { min-width: 0; margin: 0; color: var(--adv-muted); font-size: 12px; line-height: 1.9; }
+.adventure-panel-companion img { flex: 0 0 auto; width: 90px; height: 135px; object-fit: contain; }
+.adventure-room-guest { width: 120px; height: 180px; max-width: 27%; }
+@media (max-width: 500px) { .adventure-panel-companion { gap: 12px; } .adventure-panel-companion img { width: 74px; height: 111px; } .adventure-room-guest { width: 82px; height: 135px; max-width: 29%; } }

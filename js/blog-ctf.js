@@ -19,7 +19,7 @@
   };
   const hints = {
     signal: ['此方：信的外面包了一层 Base64。先拆开看看，里面的字母也许还不是原文。', '此方：坐标是列字母加行号。便签说从终点抄回来，所以要把五个坐标倒着走，再去字母格里取字。', '此方：那几个字母是密钥。选 Vigenère，把刚才读出的密文和密钥放进去。', '此方：倒着走取出的是 AKIBA。Vigenère 只在遇到英文字母时推进密钥；花括号和下划线不占位置。'],
-    source: ['春日：先看登记处和资料柜的规则。同一份申请，两个地方的读法一样吗？', '春日：登记处检查的是原始参数名，资料柜会先做 URL 解码。按字节编码的小工具也许用得上。', '春日：两种写法可以还原成同一个名字。原文别重复，解码后的后一个值又会覆盖前一个。', '春日：试试 club=ordinary&cl%75b=sos&item=snack。第二个名字解码后也是 club，资料柜最后读到的是 sos。'],
+    source: ['春日：先点开两个窗口的规则。找找「原始名称」「解码」「后面的值」这几个词，先别急着改申请。', '春日：直接换成 sos 会被挡，同一个原始名字写两次也会被挡。能不能让两种不同的写法，解码后变成同一个名字？', '春日：借 URL 小工具，把 club 按字节编码，再还原一次看看。编码后的名字仍是 club，原文却变了。', '春日：保留 club=ordinary 和 item=snack，后面再加一项：名字用你编码好的 club，值写 sos。资料柜保留最后一个同名值，顺序也要想清楚。'],
     stack: ['红莉栖：buf 16 字节，RBP 8 字节。返回地址从偏移 24 开始，先把位置摆对。', '红莉栖：选 win()。地址正确还不够，这个模型要求入口 RSP % 16 = 8；直接返回进去是 0。', '红莉栖：填充保持 24，在 win() 前接一个 ret()。它再弹出 8 字节，入口余数就从 0 变成 8。']
   };
   const reactions = {
@@ -102,8 +102,10 @@
     button.addEventListener('click', () => {
       const id = button.dataset.mentorHelp;
       if (!hints[id]) return;
+      const shownHint = hintSteps[id] + 1;
       say(id, hints[id][hintSteps[id]]);
       hintSteps[id] = Math.min(hintSteps[id] + 1, hints[id].length - 1);
+      if (id === 'source') button.textContent = shownHint === hints[id].length ? '再看这张便签' : '再问一句（' + shownHint + '/' + hints[id].length + '）';
     });
   });
   root.querySelectorAll('[data-flag-form]').forEach(form => {
@@ -211,6 +213,7 @@
     if (webQuery) webQuery.value = 'club=ordinary&item=snack';
     [webResponse, webRule, urlOutput].forEach(node => { if (node) { node.hidden = true; node.textContent = ''; } });
     if (urlInput) urlInput.value = '';
+    const help = $('[data-mentor-help="source"]'); if (help) help.textContent = '问问春日';
     root.querySelectorAll('[data-web-rule]').forEach(b => b.setAttribute('aria-pressed','false'));
   }
   function displayWeb(node, value) { if(node) { node.hidden = false; const order = ['status','error','note','message','desk','cabinet']; node.textContent = typeof value === 'string' ? value : JSON.stringify(Object.fromEntries(Object.entries(value).sort((a,b)=>order.indexOf(a[0])-order.indexOf(b[0]))),null,2); } }
@@ -232,7 +235,12 @@
   $('[data-web-send]')?.addEventListener('click', () => {
     const result=readApplication(webQuery?.value || '');
     displayWeb(webResponse,result);
-    say('source',result.note ? '春日：便签拿回来了。饼干也给你留一块～' : result.status===200 ? '春日：还是普通部的盒子。看看两个窗口究竟怎么读这份申请。' : '春日：申请卡住了。退回理由和窗口规则放一起看。');
+    if (result.note) say('source', '春日：便签拿回来了。饼干也给你留一块～');
+    else if (result.status === 403) say('source', '春日：卡在登记处了。先保留它允许的普通部申请，再比较另一个窗口的读法。');
+    else if (result.error?.includes('重复')) say('source', '春日：它不收原文里同名的参数。原始名字和解码后的名字，算的是同一回事吗？');
+    else if (result.status === 404) say('source', '春日：登记处放行了，可柜子没对上。社团用 ordinary 或 sos，条目是 snack。');
+    else if (result.status === 200) say('source', '春日：通过了，却还是普通部的盒子。看看 cabinet 里最后读到的 club，参数顺序也会影响它。');
+    else say('source', '春日：先把申请的写法修好。退回理由就在结果最上面。');
   });
   root.querySelectorAll('[data-web-rule]').forEach(button=>button.addEventListener('click',()=>{
     const name=button.dataset.webRule;

@@ -261,3 +261,15 @@
   #article-container .ctf-playground .ctf-signal-tools select { min-width: 0; max-width: calc(100% - 36px); }
   #article-container .ctf-playground :is([data-web-query],[data-url-input]), #article-container .ctf-playground pre.ctf-web-result { font-size: 12px; }
 }
+
+/* A little company for each exercise, outside the working area. */
+#article-container .ctf-playground .ctf-mentor-art { grid-column: 2; grid-row: 1; align-self: center; width: 140px; margin: 0; padding: 0; }
+#article-container .ctf-playground .ctf-mentor-art .ctf-mentor-cutout { display: block; float: none; width: 100%; height: auto; max-height: 210px; margin: 0; object-fit: contain; object-position: center bottom; }
+@media (max-width: 700px) {
+  #article-container .ctf-playground .ctf-mentor-art { width: 100px; }
+  #article-container .ctf-playground .ctf-mentor-art .ctf-mentor-cutout { max-height: 150px; }
+}
+@media (max-width: 380px) {
+  #article-container .ctf-playground .ctf-mentor-art { float: right; width: 92px; margin: 0 0 6px 12px; }
+  #article-container .ctf-playground .ctf-mentor-art .ctf-mentor-cutout { max-height: 138px; }
+}
