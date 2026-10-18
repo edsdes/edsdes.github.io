@@ -65,7 +65,18 @@
   toast.setAttribute('role', 'status');
   toast.setAttribute('aria-live', 'polite');
   document.body.append(toast);
+  function syncSpace(dialog = activeDialog) {
+    if (!dialog) return;
+    const count = dialog.querySelector('[data-space-count]');
+    if (count) count.textContent = found.size + ' / ' + ids.length;
+    const keepsake = dialog.querySelector('[data-space-route="keepsake"]');
+    if (keepsake) {
+      keepsake.disabled = found.size !== ids.length;
+      keepsake.querySelector('small').textContent = found.size === ids.length ? '已解锁' : '集齐后';
+    }
+  }
   function sync() {
+    syncSpace();
     if (activeDialog?.dataset.panel === 'book') {
       activeDialog.querySelector('[data-book-count]').textContent = found.size + '/8';
       const memo = activeDialog.querySelector('[data-book-memo]');
@@ -110,7 +121,17 @@
     dialog.className = 'adventure-dialog';
     dialog.dataset.panel = kind;
     dialog.setAttribute('aria-labelledby', 'adventure-panel-title');
-    dialog.innerHTML = '<div class="adventure-panel"><header class="adventure-panel-head"><h2 id="adventure-panel-title"></h2><button type="button" class="adventure-close" aria-label="关闭窗口">×</button></header><p class="adventure-subtitle"></p><div class="adventure-panel-body"></div><p class="adventure-panel-status" role="status" aria-live="polite"></p></div>';
+    dialog.innerHTML = '<div class="adventure-panel"><aside class="adventure-space-nav"><div class="adventure-space-brand"><strong>放课后<span>。</span></strong><span>无敌马的小窝</span></div><figure class="adventure-space-scene"><img src="/img/easter-eggs/sos-clubroom.webp" width="1536" height="768" alt="" decoding="async"><figcaption>小站角落</figcaption></figure><nav class="adventure-space-routes" aria-label="彩蛋区域"><button type="button" data-space-route="book"><span>彩蛋簿</span></button><button type="button" data-space-route="anime"><span>SOS 部室</span></button><button type="button" data-space-route="terminal"><span>隐藏终端</span></button><button type="button" data-space-route="wish"><span>抽张纸条</span></button><button type="button" data-space-route="keepsake"><span>纪念卡</span><small>集齐后</small></button><a class="adventure-space-shortcut" href="/play/">CTF 小练习 ↗</a><a class="adventure-space-shortcut" href="/play/arcade/">摸鱼角 ↗</a></nav><div class="adventure-space-bottom"><p><span>彩蛋收集</span><strong data-space-count></strong></p><nav aria-label="小练习入口"><a href="/play/">CTF 小练习 <span aria-hidden="true">↗</span></a><a href="/play/arcade/">摸鱼角 <span aria-hidden="true">↗</span></a></nav></div></aside><div class="adventure-space-main"><header class="adventure-panel-head"><h2 id="adventure-panel-title"></h2><button type="button" class="adventure-close" aria-label="关闭窗口">×</button></header><p class="adventure-subtitle"></p><div class="adventure-panel-body"></div><p class="adventure-panel-status" role="status" aria-live="polite"></p></div></div>';
+    const routes = { book: openBook, anime: openAnime, terminal: openTerminal, wish: openWish, keepsake: openKeepsake };
+    dialog.querySelectorAll('[data-space-route]').forEach(button => {
+      if (button.dataset.spaceRoute === kind) button.setAttribute('aria-current', 'page');
+      button.addEventListener('click', () => {
+        const route = button.dataset.spaceRoute;
+        if (route === kind || (route === 'keepsake' && found.size !== ids.length)) return;
+        routes[route]();
+      });
+    });
+    syncSpace(dialog);
     dialog.querySelector('h2').textContent = title;
     dialog.querySelector('.adventure-subtitle').textContent = subtitle;
     dialog.querySelector('.adventure-close').addEventListener('click', () => dialog.close());
@@ -138,6 +159,7 @@
     document.documentElement.style.overflow = 'hidden';
     document.body.append(dialog);
     dialog.showModal();
+    dialog.querySelector('[data-space-route][aria-current="page"]')?.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'auto' });
     window.dispatchEvent(new CustomEvent('blog:panel', { detail: { open: true, kind } }));
     toast.classList.remove('is-visible');
     return dialog;
