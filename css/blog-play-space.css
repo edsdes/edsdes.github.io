@@ -57,47 +57,48 @@ body:has(#article-container :is(.ctf-playground, .arcade-room)) #footer::before 
   color: var(--space-muted); font-size: 12px; text-decoration: none; white-space: nowrap;
 }
 #article-container :is(.ctf-playground, .arcade-room) .play-space-topbar :is(a,button):hover { color: var(--space-blue); }
-#article-container :is(.ctf-playground, .arcade-room) .play-space-hero {
-  position: relative; display: block; min-width: 0; margin: 0; padding: 0; overflow: hidden;
-  background: #f1f6fc; isolation: isolate;
+#article-container :is(.ctf-playground,.arcade-room) .play-space-hero {
+  position:relative; display:block; width:calc(100% - 64px); max-width:960px;
+  min-width:0; margin:0 auto; padding:0; overflow:visible; background:transparent; isolation:isolate;
 }
-#article-container :is(.ctf-playground, .arcade-room) .play-space-hero::after {
-  position: absolute; z-index: -1; inset: 0; pointer-events: none;
-  background: linear-gradient(90deg,#f4f8ff 0%,#f4f8ffef 26%,#f4f8ff88 48%,#f4f8ff00 78%); content: "";
-}
-#article-container .ctf-playground .ctf-hero-photo,
-#article-container .arcade-room .arcade-room-picture {
-  position: absolute; z-index: -2; inset: 0; width: 100%; height: 100%; max-height: none; margin: 0;
-}
-#article-container .ctf-playground .ctf-hero-photo img,
-#article-container .arcade-room .arcade-room-picture {
-  display: block; width: 100%; height: 100%; max-height: none; margin: 0; aspect-ratio: auto;
-  object-fit: cover; object-position: 68% 45%;
-}
-#article-container .ctf-playground .ctf-hero-photo figcaption { display: none; }
+#article-container :is(.ctf-playground,.arcade-room) .play-space-hero::after { content:none; }
 #article-container .ctf-playground .ctf-hero-copy,
 #article-container .arcade-room .arcade-heading-copy {
-  position: relative; display: flex; flex-direction: column; align-items: flex-start; justify-content: center;
-  gap: 0; width: min(540px,48%); min-height: clamp(420px,54vw,570px);
-  margin: 0 0 0 clamp(30px,8vw,150px); padding: 52px 0;
+  position:relative; display:flex; flex-direction:column; align-items:flex-start; justify-content:flex-start;
+  width:100%; min-height:0; gap:0; margin:0; padding:0 0 44px;
 }
-#article-container :is(.ctf-playground, .arcade-room) .play-space-eyebrow {
-  margin: 0 0 15px; color: #4773a9; font-size: 12px; font-weight: 500; letter-spacing: .08em;
+#article-container :is(.ctf-playground,.arcade-room) .play-space-eyebrow {
+  margin:0; color:var(--space-ink); font-size:22px; font-weight:700; line-height:1.6; letter-spacing:0;
 }
+#article-container :is(.ctf-playground,.arcade-room) .play-space-eyebrow::after {
+  display:block; margin-left:82px; color:#b0b8c2; font:10px/1.5 Arial,sans-serif; letter-spacing:.03em;
+}
+#article-container .ctf-playground .play-space-eyebrow::after { content:"CTF PLAYGROUND"; }
+#article-container .arcade-room .play-space-eyebrow::after { content:"AFTER SCHOOL"; }
 #article-container .ctf-playground .ctf-title,
 #article-container .arcade-room .arcade-title {
-  margin: 0 0 20px; padding: 0; color: #243e5d; font-size: clamp(30px,3.1vw,48px);
-  font-weight: 650; line-height: 1.45; letter-spacing: .02em;
+  position:relative; align-self:center; max-width:100%; margin:36px 0 24px; padding:0 18px;
+  color:#5591d1; font-size:clamp(32px,3.6vw,52px); font-weight:300; line-height:1.6; letter-spacing:.08em; text-align:center; background:linear-gradient(110deg,#58a6dc,#3778e5 50%,#c397d3); background-clip:text; -webkit-background-clip:text; color:transparent;
 }
+#article-container :is(.ctf-playground,.arcade-room) :is(.ctf-title,.arcade-title)::before,
+#article-container :is(.ctf-playground,.arcade-room) :is(.ctf-title,.arcade-title)::after {
+  position:absolute; width:12px; height:18px; content:""; pointer-events:none;
+}
+#article-container :is(.ctf-playground,.arcade-room) :is(.ctf-title,.arcade-title)::before { top:0; left:0; border-top:2px solid #519ce5; border-left:2px solid #519ce5; }
+#article-container :is(.ctf-playground,.arcade-room) :is(.ctf-title,.arcade-title)::after { right:0; bottom:0; border-right:2px solid #b18cca; border-bottom:2px solid #b18cca; }
 #article-container .ctf-playground .ctf-intro,
-#article-container .arcade-room .arcade-intro { max-width: 31em; margin: 0 0 14px; color: #405972; font-size: 14px; line-height: 2; }
-#article-container .ctf-playground .ctf-hero-aside { margin: 0 0 22px; color: #687d92; font-size: 12px; }
-#article-container :is(.ctf-playground, .arcade-room) .play-space-primary {
-  display: inline-flex; align-items: center; justify-content: center; min-height: 46px; margin-top: 18px;
-  padding: 9px 23px; border: 1px solid #397bda; border-radius: 0; background: #397bda;
-  color: #fff; font-size: 13px; text-decoration: none; line-height: 1.8;
+#article-container .arcade-room .arcade-intro { align-self:center; max-width:46em; margin:0 0 10px; color:var(--space-muted); font-size:14px; line-height:2; text-align:center; }
+#article-container .ctf-playground .ctf-hero-aside { align-self:center; margin:0; color:var(--space-muted); font-size:12px; text-align:center; }
+#article-container :is(.ctf-playground,.arcade-room) .play-space-primary {
+  display:inline-flex; align-self:center; align-items:center; min-height:44px; margin:15px 0 0; padding:5px 0;
+  border:0; border-radius:0; background:transparent; color:var(--space-blue); font-size:13px; text-decoration:none; line-height:1.8;
 }
-#article-container :is(.ctf-playground, .arcade-room) .play-space-primary:hover { border-color: #285caf; background: #285caf; color: #fff; }
+#article-container :is(.ctf-playground,.arcade-room) .play-space-primary:hover { background:transparent; color:var(--space-blue); text-decoration:underline; }
+#article-container .ctf-playground .ctf-hero-photo,
+#article-container .arcade-room .arcade-room-picture { position:static; z-index:auto; inset:auto; width:100%; height:340px; max-height:none; margin:0; border:0; border-radius:0; box-shadow:none; }
+#article-container .ctf-playground .ctf-hero-photo img,
+#article-container .arcade-room .arcade-room-picture { display:block; width:100%; height:340px; max-height:none; margin:0; aspect-ratio:auto; object-fit:cover; object-position:center 28%; border-radius:0; }
+#article-container .ctf-playground .ctf-hero-photo figcaption { display:none; }
 #article-container .ctf-playground .ctf-passport {
   position: relative; display: flex; flex-wrap: wrap; align-items: center; gap: 12px 28px;
   grid-column: auto; width: 100%; margin: 0; padding: 18px clamp(24px,8vw,150px);
@@ -108,18 +109,17 @@ body:has(#article-container :is(.ctf-playground, .arcade-room)) #footer::before 
 #article-container .ctf-playground .ctf-badge { border-color: var(--space-line); border-radius: 0; background: var(--space-tint); color: var(--space-muted); font-size: 11px; }
 #article-container .ctf-playground .ctf-badge.is-earned { border-color: #85bba7; background: #edf7f2; color: #39745a; }
 #article-container .ctf-playground .ctf-completion { flex-basis: 100%; }
-#article-container :is(.ctf-playground, .arcade-room) .play-space-sections {
-  position: sticky; top: var(--play-topbar-size); z-index: 15; display: flex; align-items: center; gap: 0;
-  width: 100%; max-width: 100%; min-height: 60px; margin: 0; padding: 0 clamp(16px,8vw,150px);
-  overflow-x: auto; border-bottom: 1px solid var(--space-line); background: var(--space-paper);
-  scrollbar-width: thin; scrollbar-color: #b7cce8 transparent;
+#article-container :is(.ctf-playground,.arcade-room) .play-space-sections {
+  position:sticky; top:var(--play-topbar-size); z-index:15; display:flex; align-items:center; justify-content:flex-end; gap:0;
+  width:calc(100% - 64px); max-width:960px; min-height:46px; margin:84px auto 40px; padding:10px 0;
+  overflow-x:auto; border:0; background:var(--space-paper); scrollbar-width:thin; scrollbar-color:#b7cce8 transparent;
 }
-#article-container :is(.ctf-playground, .arcade-room) .play-space-sections a {
-  flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: center;
-  min-height: 60px; padding: 12px clamp(15px,3vw,42px); border-bottom: 2px solid transparent;
-  color: var(--space-muted); font-size: 13px; text-decoration: none; white-space: nowrap;
+#article-container :is(.ctf-playground,.arcade-room) .play-space-sections a {
+  position:relative; flex:0 0 auto; display:inline-flex; align-items:center; justify-content:center;
+  min-height:26px; padding:2px 22px; border:0; border-radius:0; color:#687381; font-size:14px; line-height:1.6; text-decoration:none; white-space:nowrap;
 }
-#article-container :is(.ctf-playground, .arcade-room) .play-space-sections a:is(:hover,[aria-current]) { color: var(--space-blue); border-bottom-color: var(--space-blue); }
+#article-container :is(.ctf-playground,.arcade-room) .play-space-sections a + a { margin-left:12px; }
+#article-container :is(.ctf-playground,.arcade-room) .play-space-sections a:is(:hover,[aria-current]) { color:#fff; border:0; background:#3778e5; }
 #article-container .ctf-playground .ctf-challenge {
   width: calc(100% - 64px); max-width: 1120px; margin: 0 auto; padding: 62px 36px;
   border: 0; border-bottom: 1px solid var(--space-line); background: var(--space-paper);
@@ -225,3 +225,73 @@ body:has(#article-container :is(.ctf-playground, .arcade-room)) #footer::before 
 
 /* The activity pages have their own navigation; leave the work area unobstructed. */
 body:has(#article-container :is(.ctf-playground,.arcade-room)) #rightside { display: none !important; }
+
+/* The supplied miHoYo about page: cold grid, edge dots, rectangular section tabs. */
+body:has(#article-container :is(.ctf-playground,.arcade-room)) {
+  --space-ink:#2b303b; --space-muted:#535d6d; --space-blue:#3778e5; --space-paper:#f7f8fb; --space-tint:#edf2f8; --space-line:#e1e7ef;
+}
+#article-container :is(.ctf-playground,.arcade-room) {
+  position:relative; isolation:isolate;
+  background-color:var(--space-paper);
+  background-image:linear-gradient(#5685bf05 1px,transparent 1px),linear-gradient(90deg,#5685bf05 1px,transparent 1px);
+  background-size:22px 22px;
+}
+#article-container :is(.ctf-playground,.arcade-room)::before {
+  position:absolute; z-index:-1; top:180px; left:0; width:180px; height:480px;
+  background-image:radial-gradient(#a8bddc75 1.2px,transparent 1.5px); background-size:16px 16px;
+  mask-image:linear-gradient(90deg,#000,transparent); pointer-events:none; content:"";
+}
+#article-container :is(.ctf-playground,.arcade-room)::after {
+  position:absolute; z-index:-1; top:110px; right:26px; height:290px; border-right:11px solid #3778e5;
+  padding-right:14px; color:#5685bf12; font:700 68px/1 Arial,sans-serif; writing-mode:vertical-rl; pointer-events:none; content:"AFTER SCHOOL";
+}
+#article-container :is(.ctf-playground,.arcade-room) .play-space-topbar { min-height:83px; background:#fff; }
+#article-container :is(.ctf-playground,.arcade-room) .play-space-toplinks [aria-current="page"] { font-weight:700; }
+#article-container :is(.ctf-playground,.arcade-room) .play-space-toplinks [aria-current="page"]::after { content:none; }
+#article-container .ctf-playground .ctf-passport { padding:22px 0; border-bottom:1px solid var(--space-line); background:transparent; }
+#article-container .ctf-playground .ctf-badge { border:0; background:transparent; padding:0; }
+#article-container .ctf-playground .ctf-challenge { max-width:960px; padding:56px 0; background:transparent; scroll-margin-top:calc(var(--play-topbar-size) + 72px); }
+#article-container .ctf-playground .ctf-challenge-heading h3 { font-size:23px; font-weight:650; }
+#article-container .ctf-playground :is(.ctf-terminal,.ctf-source-preview) { border-radius:0; }
+#article-container .ctf-playground #ctf-radio { max-width:960px; background:var(--space-paper); }
+#article-container .ctf-playground :is(.ctf-footnote,.ctf-replay) { max-width:960px; }
+#article-container .arcade-room .arcade-games { max-width:1024px; }
+#article-container .arcade-room .arcade-game { padding:56px 0; scroll-margin-top:calc(var(--play-topbar-size) + 72px); }
+#article-container .arcade-room .arcade-game-side { display:flex; flex-direction:column; align-items:flex-start; }
+#article-container .arcade-room .arcade-mentor-art { float:none; }
+#article-container .arcade-room .arcade-room-back { max-width:1024px; }
+[data-theme="dark"] body:has(#article-container :is(.ctf-playground,.arcade-room)) { --space-ink:#e0e8f2; --space-muted:#b0bdd0; --space-blue:#8dbaff; --space-paper:#182333; --space-tint:#1e2d41; --space-line:#34465c; }
+[data-theme="dark"] #article-container :is(.ctf-playground,.arcade-room) .play-space-topbar { background:#182333; }
+[data-theme="dark"] #article-container :is(.ctf-playground,.arcade-room) .play-space-sections a { color:#b4c1d3; }
+[data-theme="dark"] #article-container :is(.ctf-playground,.arcade-room) .play-space-sections a:is(:hover,[aria-current]) { color:#fff; }
+@media(max-width:1199px) {
+  #article-container :is(.ctf-playground,.arcade-room)::after { display:none; }
+  #article-container :is(.ctf-playground,.arcade-room)::before { width:70px; opacity:.5; }
+}
+@media(max-width:1000px) {
+  #article-container .ctf-playground .ctf-challenge { padding:44px 22px; }
+  #article-container .arcade-room .arcade-game { gap:28px; padding:44px 0; }
+}
+@media(max-width:700px) {
+  #article-container :is(.ctf-playground,.arcade-room)::after { display:none; }
+  #article-container :is(.ctf-playground,.arcade-room) .play-space-hero { display:block; width:calc(100% - 40px); margin:0 20px; padding:0; }
+  #article-container :is(.ctf-playground,.arcade-room) .play-space-sections { justify-content:flex-start; width:100%; margin:20px 0 24px; padding:8px 16px; min-height:60px; }
+  #article-container :is(.ctf-playground,.arcade-room) .play-space-sections a { min-height:44px; padding:8px 15px; font-size:12px; }
+  #article-container :is(.ctf-playground,.arcade-room) .play-space-sections a + a { margin-left:4px; }
+  #article-container .ctf-playground .ctf-hero-copy,#article-container .arcade-room .arcade-heading-copy { width:100%; margin:0; padding:0 0 26px; }
+  #article-container :is(.ctf-playground,.arcade-room) .play-space-eyebrow { font-size:18px; }
+  #article-container :is(.ctf-playground,.arcade-room) .play-space-eyebrow::after { margin-left:50px; font-size:9px; }
+  #article-container .ctf-playground .ctf-title,#article-container .arcade-room .arcade-title { font-size:29px; line-height:1.7; margin:24px 0 18px; padding:0 10px; letter-spacing:.04em; }
+  #article-container .ctf-playground .ctf-intro,#article-container .arcade-room .arcade-intro { font-size:12px; }
+  #article-container .ctf-playground .ctf-hero-photo,#article-container .ctf-playground .ctf-hero-photo img,#article-container .arcade-room .arcade-room-picture { position:static; width:100%; min-height:0; height:200px; margin:0; }
+  #article-container .ctf-playground .ctf-passport { padding:18px 0; }
+  #article-container .ctf-playground .ctf-challenge { width:100%; padding:36px 22px; }
+  #article-container .ctf-playground .ctf-challenge-heading h3 { font-size:20px; }
+  #article-container .arcade-room .arcade-game { padding:36px 0; }
+  #article-container .arcade-room .arcade-game-side { display:flow-root; }
+}
+
+/* Keep the complete composition and every character in the room. */
+#article-container .ctf-playground .ctf-hero-photo,
+#article-container .ctf-playground .ctf-hero-photo img,
+#article-container .arcade-room .arcade-room-picture {height:auto; min-height:0; aspect-ratio:auto; object-fit:contain;}
